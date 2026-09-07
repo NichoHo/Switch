@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Payment detail</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="crumb">
+        <a th:href="@{/dashboard/payments}">Payments</a> /
+        <span th:text="${payment.id}">-</span>
+    </div>
+
+    <div class="page-head">
+        <div>
+            <h1 th:text="${#strings.substring(payment.id, 0, 8)}">00000000</h1>
+            <p th:text="${payment.merchantReference}">-</p>
+        </div>
+        <div class="actions">
+            <span th:class="'badge s-' + ${#strings.toLowerCase(payment.state)}"
+                  th:text="${payment.state}">CREATED</span>
+        </div>
+    </div>
+
+    <div class="metrics">
+        <div class="metric">
+            <div class="k">Authorized</div>
+            <div class="v">
+                <span th:text="${#numbers.formatDecimal(payment.amountMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                <span class="cur" th:text="${payment.currency}">EUR</span>
+            </div>
+        </div>
+        <div class="metric">
+            <div class="k">Captured</div>
+            <div class="v">
+                <span th:text="${#numbers.formatDecimal(payment.capturedAmountMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                <span class="cur" th:text="${payment.currency}">EUR</span>
+            </div>
+        </div>
+        <div class="metric">
+            <div class="k">Refunded</div>
+            <div class="v">
+                <span th:text="${#numbers.formatDecimal(payment.refundedAmountMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                <span class="cur" th:text="${payment.currency}">EUR</span>
+            </div>
+        </div>
+        <div class="metric">
+            <div class="k">Risk score</div>
+            <div class="v" th:text="${payment.riskScore != null ? payment.riskScore : '-'}">-</div>
+            <div class="d" th:text="${payment.riskDecision != null ? payment.riskDecision : 'not assessed'}">-</div>
+        </div>
+    </div>
+
+    <div class="grid g-2">
+
+        <div class="panel">
+            <div class="panel-head">Details</div>
+            <div class="panel-body">
+                <dl class="kv">
+                    <dt>Payment ID</dt>
+                    <dd th:text="${payment.id}">-</dd>
+
+                    <dt>Merchant reference</dt>
+                    <dd th:text="${payment.merchantReference}">-</dd>
+
+                    <dt>Card token</dt>
+                    <dd th:text="${payment.cardToken != null ? payment.cardToken : '-'}">-</dd>
+
+                    <dt>Acquirer</dt>
+                    <dd th:text="${payment.acquirerId != null ? payment.acquirerId : 'not routed'}">-</dd>
+
+                    <dt>Acquirer reference</dt>
+                    <dd th:text="${payment.acquirerReference != null ? payment.acquirerReference : '-'}">-</dd>
+
+                    <dt>Auth code</dt>
+                    <dd th:text="${payment.authCode != null ? payment.authCode : '-'}">-</dd>
+
+                    <dt>Liability shift</dt>
+                    <dd th:text="${payment.liabilityShift} ? 'yes, 3DS authenticated' : 'no'">no</dd>
+
+                    <dt>Dispute</dt>
+                    <dd>
+                        <span th:if="${payment.disputeState == null}">none</span>
+                        <span th:if="${payment.disputeState != null}"
+                              th:class="'badge s-' + ${#strings.toLowerCase(payment.disputeState)}"
+                              th:text="${payment.disputeState}">OPENED</span>
+                    </dd>
+
+                    <dt>Created (UTC)</dt>
+                    <dd th:text="${#temporals.format(payment.createdAt, 'yyyy-MM-dd HH:mm:ss', 'UTC')}">-</dd>
+
+                    <dt>Updated (UTC)</dt>
+                    <dd th:text="${payment.updatedAt != null
+                                   ? #temporals.format(payment.updatedAt, 'yyyy-MM-dd HH:mm:ss', 'UTC')
+                                   : '-'}">-</dd>
+
+                    <dt>Version</dt>
+                    <dd th:text="${payment.version}">0</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                Timeline
+                <span class="spacer"></span>
+                <span class="result t3" th:text="${#lists.size(events)} + ' events'">0 events</span>
+            </div>
+            <div class="panel-body">
+
+                <ol class="timeline" th:if="${not #lists.isEmpty(events)}">
+                    <li th:each="event : ${events}">
+                        <span class="node" th:classappend="'s-' + ${#strings.toLowerCase(event.toState)}"></span>
+                        <div>
+                            <div class="ev">
+                                <span th:if="${event.fromState != null}"
+                                      th:text="${event.fromState} + ' to ' + ${event.toState}">CREATED to AUTHORIZED</span>
+                                <span th:if="${event.fromState == null}" th:text="${event.toState}">CREATED</span>
+                            </div>
+                            <div class="meta">
+                                <span th:text="${#temporals.format(event.createdAt, 'yyyy-MM-dd HH:mm:ss', 'UTC')}">-</span>
+                                <span th:if="${event.actor != null}" th:text="' / ' + ${event.actor}"></span>
+                                <span th:if="${event.reasonCode != null}" th:text="' / ' + ${event.reasonCode}"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ol>
+
+                <div class="empty" th:if="${#lists.isEmpty(events)}">
+                    <div class="glyph"></div>
+                    <h3>No events recorded</h3>
+                    <p>The append-only <code>payment_event</code> log has no rows for this payment.</p>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

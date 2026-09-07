@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Risk</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-head">
+        <div>
+            <h1>Risk engine</h1>
+            <p>Assessments are insert-only. Every decision keeps its full per-rule breakdown.</p>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <div class="table-bar">
+            <span class="spacer"></span>
+            <span class="result"><span th:text="${#lists.size(assessments)}">0</span> shown</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Payment</th>
+                    <th scope="col">Decision</th>
+                    <th scope="col" class="num">Score</th>
+                    <th scope="col" class="num">Thresholds</th>
+                    <th scope="col">Ruleset</th>
+                    <th scope="col" class="num">Amount</th>
+                    <th scope="col">Assessed (UTC)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="a : ${assessments}">
+                    <td>
+                        <a class="id-link" th:href="@{/dashboard/payments/{id}(id=${a.paymentId})}"
+                           th:text="${#strings.substring(a.paymentId, 0, 8)}">00000000</a>
+                    </td>
+                    <td>
+                        <span th:class="'badge s-' + ${#strings.toLowerCase(a.decision)}"
+                              th:text="${a.decision}">ALLOW</span>
+                    </td>
+                    <td class="num" th:text="${a.score}">0</td>
+                    <td class="num t3"
+                        th:text="${a.challengeThreshold} + ' / ' + ${a.denyThreshold}">0 / 0</td>
+                    <td class="t2" th:text="${a.rulesetVersion}">-</td>
+                    <td class="num" th:text="${#numbers.formatDecimal(a.amountMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    <td class="t3 num"
+                        th:text="${#temporals.format(a.createdAt, 'yyyy-MM-dd HH:mm:ss', 'UTC')}">-</td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(assessments)}">
+                    <td colspan="7">
+                        <div class="empty">
+                            <div class="glyph"></div>
+                            <h3>No assessments yet</h3>
+                            <p>Every payment is scored on creation. Run a payment to populate this table.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

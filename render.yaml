@@ -1,0 +1,30 @@
+services:
+  # The primary gateway service
+  - type: web
+    name: switch-gateway
+    env: docker
+    dockerfilePath: ./gateway/Dockerfile
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: ADMIN_API_KEY
+        generateValue: true
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=70 -XX:+UseSerialGC -Xss512k -XX:TieredStopAtLevel=1"
+        
+  # The simulated acquirer service (for 3DS and fault injection)
+  - type: web
+    name: switch-acquirer-sim
+    env: docker
+    dockerfilePath: ./acquirer-sim/Dockerfile
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=70 -XX:+UseSerialGC -Xss512k -XX:TieredStopAtLevel=1"

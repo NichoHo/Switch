@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Acquirers</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-head">
+        <div>
+            <h1>Acquirers</h1>
+            <p>Routing candidates are filtered by brand, currency and issuer country,
+               then ordered by priority and cost.</p>
+        </div>
+    </div>
+
+    <div class="grid g-auto mb-5">
+        <div class="panel" th:each="acq : ${acquirers}">
+            <div class="panel-head">
+                <span th:text="${acq.id()}">ACQUIRER</span>
+                <span class="spacer"></span>
+                <span class="badge" th:classappend="${acq.enabled()} ? 's-captured' : 's-voided'"
+                      th:text="${acq.enabled()} ? 'ENABLED' : 'DISABLED'">ENABLED</span>
+            </div>
+            <div class="panel-body">
+                <dl class="kv">
+                    <dt>Brands</dt>
+                    <dd th:text="${#strings.setJoin(acq.brands(), ', ')}">-</dd>
+
+                    <dt>Currencies</dt>
+                    <dd th:text="${#strings.setJoin(acq.currencies(), ', ')}">-</dd>
+
+                    <dt>Issuer countries</dt>
+                    <dd th:text="${#strings.setJoin(acq.issuerCountries(), ', ')}">-</dd>
+
+                    <dt>Priority</dt>
+                    <dd th:text="${acq.priority()}">0</dd>
+
+                    <dt>Cost</dt>
+                    <dd th:text="${acq.costBps()} + ' bps plus ' + ${#numbers.formatDecimal(acq.costFixedMinor() / 100.0, 1, 2)} + ' fixed'">-</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-warn">
+        <span class="bar"></span>
+        <div>
+            <b>Fault injection is not wired to this page.</b>
+            The simulator accepts it at <code>PUT /admin/faults/{acquirerId}</code>, and the router
+            already fails over and trips its breaker. The gateway still needs an endpoint here to
+            forward that call before the controls can live in the console.
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

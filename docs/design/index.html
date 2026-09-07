@@ -1,0 +1,1025 @@
+<title>Switch Console Design System</title>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;450;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   SWITCH CONSOLE - DESIGN SYSTEM
+   Three directions. Same components, same markup, different token block.
+   Whichever you pick becomes the :root block of gateway dashboard.css.
+   ========================================================================== */
+
+/* --- primitives shared by all three ------------------------------------- */
+:root {
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px; --sp-12: 56px;
+  --ease: cubic-bezier(.2, .6, .3, 1);
+  --sidebar-w: 216px;
+}
+
+/* --- A. LEDGER ---------------------------------------------------------- */
+/* Light, paper-neutral. Ink-blue accent used only for actions and focus.
+   Reads like an audit surface. */
+[data-ds="ledger"] {
+  --bg:            #f7f7f5;
+  --bg-subtle:     #f1f1ed;
+  --surface:       #ffffff;
+  --surface-2:     #fafaf8;
+  --surface-hover: #f4f4f1;
+  --border:        #e4e4de;
+  --border-strong: #cdcdc5;
+  --text:          #17181a;
+  --text-2:        #5c5f66;
+  --text-3:        #6b7077;
+
+  --accent:        #1b4bcc;
+  --accent-hover:  #1640ad;
+  --accent-on:     #ffffff;
+  --accent-tint:   rgba(27, 75, 204, .08);
+
+  --ok:      #0f7a4d;
+  --warn:    #9a5b00;
+  --danger:  #b3261e;
+  --info:    #1b4bcc;
+  --violet:  #6b46a8;
+  --rose:    #a32552;
+  --muted:   #6b7078;
+
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --fs-base:  13.5px;
+  --row-y:    10px;
+  --head-w:   600;
+
+  --r-sm: 3px; --r: 5px; --r-lg: 7px; --r-pill: 4px;
+  --shadow-1: 0 1px 2px rgba(23, 24, 26, .05);
+  --shadow-2: 0 2px 4px rgba(23, 24, 26, .06), 0 1px 2px rgba(23, 24, 26, .04);
+  --badge-case: none;
+  --badge-track: .01em;
+}
+
+/* --- B. CONSOLE --------------------------------------------------------- */
+/* Dark, flat charcoal. No blur, no glow, no gradient. Borders carry the
+   structure. One lime signal colour, reserved for actions and focus so it
+   never competes with the semantic state colours. */
+[data-ds="console"] {
+  --bg:            #0c0d0f;
+  --bg-subtle:     #101215;
+  --surface:       #141518;
+  --surface-2:     #191b1f;
+  --surface-hover: #1d2025;
+  --border:        #26282e;
+  --border-strong: #3a3d45;
+  --text:          #e8eaec;
+  --text-2:        #9aa0a8;
+  --text-3:        #7c838c;
+
+  --accent:        #c8f052;
+  --accent-hover:  #d5f677;
+  --accent-on:     #131707;
+  --accent-tint:   rgba(200, 240, 82, .10);
+
+  --ok:      #45c98c;
+  --warn:    #e0a33a;
+  --danger:  #f2585c;
+  --info:    #5fa8ff;
+  --violet:  #a78bfa;
+  --rose:    #f472a6;
+  --muted:   #8b929b;
+
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --fs-base:  13px;
+  --row-y:    9px;
+  --head-w:   600;
+
+  --r-sm: 4px; --r: 6px; --r-lg: 8px; --r-pill: 999px;
+  --shadow-1: none;
+  --shadow-2: none;
+  --badge-case: none;
+  --badge-track: .01em;
+}
+
+/* --- C. TERMINAL -------------------------------------------------------- */
+/* Newsprint grey, monospace throughout, zero radius, maximum density.
+   Accent is black: hierarchy comes from weight and rules, colour is spent
+   only on payment state. An instrument, not an app. */
+[data-ds="terminal"] {
+  --bg:            #e9e9e4;
+  --bg-subtle:     #e3e3dd;
+  --surface:       #f5f5f1;
+  --surface-2:     #eeeee9;
+  --surface-hover: #e6e6e0;
+  --border:        #c8c7bf;
+  --border-strong: #92918a;
+  --text:          #111110;
+  --text-2:        #4a4a45;
+  --text-3:        #63625b;
+
+  --accent:        #111110;
+  --accent-hover:  #35342f;
+  --accent-on:     #f5f5f1;
+  --accent-tint:   rgba(17, 17, 16, .07);
+
+  --ok:      #1e6b45;
+  --warn:    #8a5300;
+  --danger:  #9b1c1c;
+  --info:    #1e3a8a;
+  --violet:  #573b96;
+  --rose:    #8f2450;
+  --muted:   #5e5d57;
+
+  --font-sans: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --fs-base:  12.5px;
+  --row-y:    5px;
+  --head-w:   700;
+
+  --r-sm: 0; --r: 0; --r-lg: 0; --r-pill: 0;
+  --shadow-1: none;
+  --shadow-2: none;
+  --badge-case: uppercase;
+  --badge-track: .06em;
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Monospace is reserved for status enums (payment state, breaker state) and
+   keyboard keys. Everything else, figures included, is the sans face with
+   tabular figures so columns still line up. */
+.mono { font-family: var(--font-mono); }
+.num  { font-variant-numeric: tabular-nums; }
+.t2 { color: var(--text-2); }
+.t3 { color: var(--text-3); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ==========================================================================
+   PICKER (design-system page chrome only, not part of the shipped system)
+   ========================================================================== */
+.picker {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: var(--sp-5);
+  padding: var(--sp-4) var(--sp-6);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.picker h1 { font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+.picker .opts { display: flex; gap: var(--sp-2); }
+.opt {
+  font: inherit; cursor: pointer;
+  padding: 7px var(--sp-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--text-2);
+  transition: background .12s var(--ease), color .12s var(--ease);
+}
+.opt:hover { background: var(--surface-hover); color: var(--text); }
+.opt[aria-pressed="true"] {
+  background: var(--accent); color: var(--accent-on);
+  border-color: var(--accent); font-weight: 500;
+}
+.picker .read { color: var(--text-2); font-size: 12.5px; max-width: 62ch; }
+
+/* ==========================================================================
+   FOUNDATIONS DISPLAY
+   ========================================================================== */
+.doc { padding: var(--sp-8) var(--sp-6) var(--sp-12); max-width: 1320px; margin: 0 auto; }
+.doc section { margin-bottom: var(--sp-12); }
+
+.sec-head {
+  display: flex; align-items: baseline; gap: var(--sp-3);
+  padding-bottom: var(--sp-3); margin-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--border);
+}
+.sec-head h2 { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.sec-head p { color: var(--text-3); font-size: 12.5px; }
+
+.grid { display: grid; gap: var(--sp-4); }
+.g-swatch { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+.g-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+.swatch {
+  border: 1px solid var(--border); border-radius: var(--r);
+  overflow: hidden; background: var(--surface);
+}
+.swatch .chip { height: 46px; }
+.swatch .meta { padding: var(--sp-2) var(--sp-3); border-top: 1px solid var(--border); }
+.swatch .name { font-size: 12px; font-weight: 500; }
+.swatch .val { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+
+.type-row {
+  display: flex; align-items: baseline; gap: var(--sp-5);
+  padding: var(--sp-3) 0; border-bottom: 1px solid var(--border);
+}
+.type-row .label {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-3);
+  width: 132px; flex: none;
+}
+
+.scale-row { display: flex; align-items: flex-end; gap: var(--sp-3); }
+.scale-row div { background: var(--accent-tint); border: 1px solid var(--accent); border-radius: var(--r-sm); }
+.scale-row span { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); display: block; margin-top: 4px; }
+
+/* ==========================================================================
+   APPLICATION SHELL
+   ========================================================================== */
+.app {
+  display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  min-height: 620px;
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  overflow: hidden; background: var(--bg);
+}
+
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: var(--sp-5) var(--sp-3);
+  display: flex; flex-direction: column; gap: var(--sp-6);
+}
+.brand {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: 0 var(--sp-2); font-weight: 600; letter-spacing: -.01em; font-size: 14px;
+}
+.brand .mark {
+  width: 18px; height: 18px; flex: none;
+  border: 1.5px solid var(--text); border-radius: var(--r-sm);
+  position: relative;
+}
+.brand .mark::after {
+  content: ""; position: absolute; inset: 3px 3px auto 3px; height: 1.5px;
+  background: var(--text); box-shadow: 0 4px 0 var(--text);
+}
+.brand .env {
+  margin-left: auto; font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-3); border: 1px solid var(--border);
+  padding: 1px 5px; border-radius: var(--r-sm); letter-spacing: .04em;
+}
+
+.nav { display: flex; flex-direction: column; gap: 1px; list-style: none; }
+.nav-label {
+  font-size: 10px; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--text-3);
+  padding: 0 var(--sp-3) var(--sp-2);
+}
+.nav-link {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 7px var(--sp-3); border-radius: var(--r-sm);
+  color: var(--text-2); text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: background .12s var(--ease), color .12s var(--ease);
+}
+.nav-link:hover { background: var(--surface-hover); color: var(--text); }
+.nav-link[aria-current="page"] {
+  background: var(--accent-tint); color: var(--text);
+  border-left-color: var(--accent); font-weight: 500;
+}
+.nav-link .count {
+  margin-left: auto; font-size: 11px; color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.content { padding: var(--sp-6); overflow: auto; }
+
+.page-head {
+  display: flex; align-items: flex-start; gap: var(--sp-4);
+  margin-bottom: var(--sp-5);
+}
+.page-head h1 { font-size: 19px; font-weight: 600; letter-spacing: -.015em; }
+.page-head p { color: var(--text-2); font-size: 12.5px; margin-top: 2px; }
+.page-head .actions { margin-left: auto; display: flex; gap: var(--sp-2); }
+
+.crumb {
+  font-size: 11.5px; color: var(--text-3);
+  margin-bottom: var(--sp-3);
+}
+.crumb a { color: var(--text-2); text-decoration: none; }
+.crumb a:hover { color: var(--text); text-decoration: underline; }
+
+/* --- metric strip: rules, not cards ------------------------------------- */
+.metrics {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--border); border-radius: var(--r);
+  background: var(--surface); margin-bottom: var(--sp-5);
+}
+.metric { padding: var(--sp-4) var(--sp-5); border-left: 1px solid var(--border); }
+.metric:first-child { border-left: 0; }
+.metric .k {
+  font-size: 11px; color: var(--text-3); letter-spacing: .02em;
+  display: flex; align-items: center; gap: var(--sp-2);
+}
+.metric .v {
+  font-variant-numeric: tabular-nums;
+  font-size: 22px; font-weight: 500; letter-spacing: -.02em; margin-top: 5px;
+  display: flex; align-items: baseline; gap: 3px;
+}
+.metric .v .cur { font-size: 14px; color: var(--text-3); }
+.metric .d { font-size: 11.5px; color: var(--text-3); margin-top: 3px; }
+.metric .d b { font-weight: 500; color: var(--ok); }
+.metric .d b.neg { color: var(--danger); }
+
+/* ==========================================================================
+   TABLE
+   ========================================================================== */
+.table-wrap {
+  border: 1px solid var(--border); border-radius: var(--r);
+  background: var(--surface); overflow-x: auto; overflow-y: hidden;
+}
+.table-bar {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--border); background: var(--surface-2);
+}
+.table-bar .spacer { margin-left: auto; }
+.table-bar .result {
+  font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums;
+}
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left; font-weight: var(--head-w); font-size: 11px;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--text-3);
+  padding: var(--sp-2) var(--sp-4);
+  border-bottom: 1px solid var(--border); background: var(--surface-2);
+  white-space: nowrap;
+}
+tbody td {
+  padding: var(--row-y) var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle; white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface-hover); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.num.t3 { text-align: left; }   /* risk score reads better left-aligned */
+td.num .cur { color: var(--text-3); }
+
+.id-link {
+  color: var(--text); text-decoration: none; font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--border-strong);
+}
+.id-link:hover { border-bottom-color: var(--accent); color: var(--accent); }
+
+/* ==========================================================================
+   BADGES  (payment state, breaker state, recon severity)
+   ========================================================================== */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  line-height: 1.5; padding: 1px 7px;
+  text-transform: var(--badge-case); letter-spacing: var(--badge-track);
+  border-radius: var(--r-pill); white-space: nowrap;
+  color: var(--h);
+  background: color-mix(in srgb, var(--h) 11%, transparent);
+  border: 1px solid color-mix(in srgb, var(--h) 26%, transparent);
+}
+.badge-created    { --h: var(--muted); }
+.badge-pending    { --h: var(--warn); }
+.badge-authorized { --h: var(--info); }
+.badge-captured   { --h: var(--ok); }
+.badge-refunded   { --h: var(--violet); }
+.badge-voided     { --h: var(--muted); }
+.badge-declined   { --h: var(--danger); }
+.badge-disputed   { --h: var(--rose); }
+.badge-unknown    { --h: var(--warn); }
+
+.badge.solid { background: var(--h); color: var(--bg); border-color: var(--h); }
+
+/* breaker pill: the one place a status dot earns its keep */
+.breaker { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11.5px; }
+.breaker .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--h); flex: none; }
+.breaker.closed    { --h: var(--ok); }
+.breaker.half-open { --h: var(--warn); }
+.breaker.open      { --h: var(--danger); }
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font: inherit; font-size: 12.5px; font-weight: 500; line-height: 1;
+  padding: 7px var(--sp-3); border-radius: var(--r-sm);
+  border: 1px solid var(--border-strong); background: var(--surface); color: var(--text);
+  cursor: pointer; white-space: nowrap; text-decoration: none;
+  transition: background .12s var(--ease), border-color .12s var(--ease);
+}
+.btn:hover { background: var(--surface-hover); border-color: var(--text-3); }
+.btn:active { transform: translateY(.5px); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-on); }
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 38%, transparent); }
+.btn-danger:hover { background: color-mix(in srgb, var(--danger) 9%, transparent); border-color: var(--danger); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text-2); }
+.btn-ghost:hover { background: var(--surface-hover); color: var(--text); border-color: transparent; }
+.btn-sm { font-size: 11.5px; padding: 4px var(--sp-2); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn .kbd {
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-3);
+  border: 1px solid var(--border); border-radius: 3px; padding: 0 3px;
+}
+
+/* ==========================================================================
+   FORM
+   ========================================================================== */
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: var(--sp-4); }
+.field label { font-size: 12px; font-weight: 500; }
+.field .help { font-size: 11.5px; color: var(--text-3); }
+.field .err { font-size: 11.5px; color: var(--danger); }
+.input, .select {
+  font: inherit; font-size: 13px; font-variant-numeric: tabular-nums;
+  padding: 7px var(--sp-3); border-radius: var(--r-sm);
+  border: 1px solid var(--border-strong); background: var(--surface); color: var(--text);
+  width: 100%;
+}
+.input::placeholder { color: var(--text-3); }
+.input:focus, .select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+
+/* ==========================================================================
+   PANELS, TIMELINE, ALERTS, EMPTY
+   ========================================================================== */
+.panel { border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
+.panel-head {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border);
+  font-size: 12.5px; font-weight: 600;
+}
+.panel-head .spacer { margin-left: auto; }
+.panel-body { padding: var(--sp-4); }
+
+.kv { display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: var(--sp-2) var(--sp-4); }
+.kv dt { font-size: 12px; color: var(--text-3); }
+.kv dd { font-size: 12.5px; word-break: break-all; font-variant-numeric: tabular-nums; }
+
+.timeline { list-style: none; }
+.timeline li {
+  display: grid; grid-template-columns: 15px minmax(0, 1fr);
+  gap: var(--sp-3); position: relative; padding-bottom: var(--sp-4);
+}
+.timeline li:last-child { padding-bottom: 0; }
+.timeline li::before {
+  content: ""; position: absolute; left: 7px; top: 14px; bottom: -2px;
+  width: 1px; background: var(--border);
+}
+.timeline li:last-child::before { display: none; }
+.timeline .node {
+  width: 15px; height: 15px; border-radius: 50%; margin-top: 3px;
+  border: 1.5px solid var(--h, var(--border-strong)); background: var(--surface);
+  position: relative; z-index: 1;
+}
+.timeline .node::after {
+  content: ""; position: absolute; inset: 3px; border-radius: 50%;
+  background: var(--h, var(--border-strong));
+}
+.timeline .ev { font-size: 12.5px; font-weight: 500; }
+.timeline .meta { font-size: 11.5px; color: var(--text-3); margin-top: 1px; font-variant-numeric: tabular-nums; }
+
+.alert {
+  display: flex; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4);
+  border: 1px solid color-mix(in srgb, var(--h) 30%, transparent);
+  background: color-mix(in srgb, var(--h) 8%, transparent);
+  border-radius: var(--r); font-size: 12.5px;
+}
+.alert.warn { --h: var(--warn); }
+.alert.danger { --h: var(--danger); }
+.alert.ok { --h: var(--ok); }
+.alert .bar { width: 2px; background: var(--h); border-radius: 2px; flex: none; }
+.alert b { font-weight: 600; }
+.alert .spacer { margin-left: auto; }
+
+.empty { text-align: center; padding: var(--sp-10) var(--sp-6); }
+.empty .glyph {
+  width: 34px; height: 34px; margin: 0 auto var(--sp-3);
+  border: 1px dashed var(--border-strong); border-radius: var(--r);
+}
+.empty h3 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.empty p { font-size: 12.5px; color: var(--text-3); max-width: 46ch; margin: 0 auto var(--sp-4); }
+
+.skeleton {
+  height: 11px; border-radius: var(--r-sm);
+  background: linear-gradient(90deg, var(--surface-2), var(--surface-hover), var(--surface-2));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.acq {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+  gap: var(--sp-4);
+}
+.acq .panel-body { display: flex; flex-direction: column; gap: var(--sp-3); }
+.acq .stats { display: flex; gap: var(--sp-5); }
+.acq .stats div { font-size: 11px; color: var(--text-3); }
+.acq .stats b {
+  display: block; font-size: 15px; font-variant-numeric: tabular-nums;
+  font-weight: 500; color: var(--text); margin-top: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { display: none; }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metric:nth-child(3) { border-left: 0; }
+  .g-2 { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+
+<div class="picker">
+  <h1>Switch Console</h1>
+  <div class="opts" role="group" aria-label="Design direction">
+    <button class="opt" data-set="ledger" aria-pressed="true">A. Ledger</button>
+    <button class="opt" data-set="console" aria-pressed="false">B. Console</button>
+    <button class="opt" data-set="terminal" aria-pressed="false">C. Terminal</button>
+  </div>
+  <p class="read" id="read"></p>
+</div>
+
+<div class="doc">
+
+  <!-- ====================== 1. THE SHELL ============================== -->
+  <section>
+    <div class="sec-head">
+      <h2>Application shell</h2>
+      <p>Payments list. The screen you will look at 90% of the time.</p>
+    </div>
+
+    <div class="app">
+      <nav class="sidebar">
+        <div class="brand">
+          <span class="mark" aria-hidden="true"></span>
+          Switch
+          <span class="env">LOCAL</span>
+        </div>
+        <ul class="nav">
+          <li class="nav-label">Operations</li>
+          <li><a class="nav-link" href="#" aria-current="page">Payments <span class="count">142</span></a></li>
+          <li><a class="nav-link" href="#">Risk <span class="count">38</span></a></li>
+          <li><a class="nav-link" href="#">Disputes <span class="count">2</span></a></li>
+          <li class="nav-label" style="margin-top:16px">Money movement</li>
+          <li><a class="nav-link" href="#">Ledger</a></li>
+          <li><a class="nav-link" href="#">Settlement <span class="count">3</span></a></li>
+          <li class="nav-label" style="margin-top:16px">Infrastructure</li>
+          <li><a class="nav-link" href="#">Acquirers</a></li>
+        </ul>
+      </nav>
+
+      <main class="content">
+        <div class="page-head">
+          <div>
+            <h1>Payments</h1>
+            <p>Last 24 hours, all merchants.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-sm">Export CSV</button>
+            <button class="btn btn-sm btn-primary">New test payment</button>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">Authorized volume</div>
+            <div class="v"><span class="cur">&euro;</span>48,213.60</div>
+            <div class="d"><b>+6.2%</b> vs yesterday</div>
+          </div>
+          <div class="metric">
+            <div class="k">Capture rate</div>
+            <div class="v">96.4<span class="cur">%</span></div>
+            <div class="d">137 of 142 authorizations</div>
+          </div>
+          <div class="metric">
+            <div class="k">Trial balance</div>
+            <div class="v"><span class="cur">&euro;</span>0.00</div>
+            <div class="d">Balanced at 09:14:07</div>
+          </div>
+          <div class="metric">
+            <div class="k">Open recon exceptions</div>
+            <div class="v">3</div>
+            <div class="d"><b class="neg">2 amount mismatch</b>, 1 missing</div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-bar">
+            <button class="btn btn-sm btn-ghost">State: all</button>
+            <button class="btn btn-sm btn-ghost">Acquirer: all</button>
+            <button class="btn btn-sm btn-ghost">Amount</button>
+            <span class="spacer"></span>
+            <span class="result">142 payments</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Payment</th>
+                <th>Merchant reference</th>
+                <th>State</th>
+                <th>Acquirer</th>
+                <th>Risk</th>
+                <th class="num">Amount</th>
+                <th class="num">Age</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a class="id-link" href="#">7f3ac21e</a></td>
+                <td class="t2">northbound-cycles-8841</td>
+                <td><span class="badge badge-captured">CAPTURED</span></td>
+                <td class="t2">VISA-NET-EU</td>
+                <td class="num t3">12</td>
+                <td class="num"><span class="cur">&euro;</span> 1,284.50</td>
+                <td class="num t3">4m 12s</td>
+              </tr>
+              <tr>
+                <td><a class="id-link" href="#">a09d4b77</a></td>
+                <td class="t2">kestrel-audio-2207</td>
+                <td><span class="badge badge-authorized">AUTHORIZED</span></td>
+                <td class="t2">MC-GLOBAL</td>
+                <td class="num t3">31</td>
+                <td class="num"><span class="cur">&euro;</span> 89.99</td>
+                <td class="num t3">6m 03s</td>
+              </tr>
+              <tr>
+                <td><a class="id-link" href="#">c41e8802</a></td>
+                <td class="t2">atlas-provisions-0416</td>
+                <td><span class="badge badge-declined">DECLINED</span></td>
+                <td class="t2">VISA-NET-EU</td>
+                <td class="num t3">88</td>
+                <td class="num"><span class="cur">&euro;</span> 12,450.00</td>
+                <td class="num t3">11m 47s</td>
+              </tr>
+              <tr>
+                <td><a class="id-link" href="#">1db6f5a3</a></td>
+                <td class="t2">hallmoor-books-1930</td>
+                <td><span class="badge badge-pending">PENDING_3DS</span></td>
+                <td class="t2">MC-GLOBAL</td>
+                <td class="num t3">54</td>
+                <td class="num"><span class="cur">&euro;</span> 47.20</td>
+                <td class="num t3">12m 08s</td>
+              </tr>
+              <tr>
+                <td><a class="id-link" href="#">98b02cd5</a></td>
+                <td class="t2">verity-labs-7752</td>
+                <td><span class="badge badge-refunded">REFUNDED</span></td>
+                <td class="t2">VISA-NET-EU</td>
+                <td class="num t3">09</td>
+                <td class="num"><span class="cur">&euro;</span> 316.00</td>
+                <td class="num t3">28m 51s</td>
+              </tr>
+              <tr>
+                <td><a class="id-link" href="#">55c7e14f</a></td>
+                <td class="t2">northbound-cycles-8839</td>
+                <td><span class="badge badge-disputed">DISPUTED</span></td>
+                <td class="t2">MC-GLOBAL</td>
+                <td class="num t3">21</td>
+                <td class="num"><span class="cur">&euro;</span> 2,090.75</td>
+                <td class="num t3">1h 04m</td>
+              </tr>
+              <tr>
+                <td><a class="id-link" href="#">e2740a96</a></td>
+                <td class="t2">stellwyn-ceramics-6104</td>
+                <td><span class="badge badge-voided">VOIDED</span></td>
+                <td class="t2">VISA-NET-EU</td>
+                <td class="num t3">17</td>
+                <td class="num"><span class="cur">&euro;</span> 640.00</td>
+                <td class="num t3">1h 22m</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- ====================== 2. DETAIL VIEW ============================ -->
+  <section>
+    <div class="sec-head">
+      <h2>Payment detail</h2>
+      <p>Event-sourced timeline, the thing worth showing off.</p>
+    </div>
+
+    <div class="grid g-2">
+      <div>
+        <div class="crumb"><a href="#">Payments</a> / 7f3ac21e-9d04-4b1a-bc77-2e08f5a91c3d</div>
+        <div class="panel" style="margin-bottom:16px">
+          <div class="panel-head">
+            Summary
+            <span class="spacer"></span>
+            <span class="badge badge-captured">CAPTURED</span>
+          </div>
+          <div class="panel-body">
+            <dl class="kv">
+              <dt>Amount</dt><dd class="num">&euro; 1,284.50 EUR</dd>
+              <dt>Captured</dt><dd class="num">&euro; 1,284.50 EUR</dd>
+              <dt>Card token</dt><dd class="num">tok_9fJ2xQ &middot; 411111&hellip;1111</dd>
+              <dt>Acquirer</dt><dd>VISA-NET-EU, attempt 2 of 2</dd>
+              <dt>Risk score</dt><dd>12, ruleset v4</dd>
+              <dt>Idempotency</dt><dd class="num">ord-8841-cap-01</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="alert warn">
+          <span class="bar"></span>
+          <div>
+            <b>Failed over on authorize.</b> MC-GLOBAL returned a timeout after 2,041 ms.
+            The breaker opened and the retry went to VISA-NET-EU.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          Timeline
+          <span class="spacer"></span>
+          <button class="btn btn-sm btn-ghost">Raw events</button>
+        </div>
+        <div class="panel-body">
+          <ol class="timeline">
+            <li>
+              <span class="node" style="--h: var(--muted)"></span>
+              <div>
+                <div class="ev">Payment created</div>
+                <div class="meta">09:14:02.114 &middot; api &middot; ord-8841</div>
+              </div>
+            </li>
+            <li>
+              <span class="node" style="--h: var(--info)"></span>
+              <div>
+                <div class="ev">Risk evaluated, score 12, ALLOW</div>
+                <div class="meta">09:14:02.147 &middot; ruleset v4 &middot; 0 rules fired</div>
+              </div>
+            </li>
+            <li>
+              <span class="node" style="--h: var(--danger)"></span>
+              <div>
+                <div class="ev">Authorize attempt failed</div>
+                <div class="meta">09:14:04.188 &middot; MC-GLOBAL &middot; timeout 2,041 ms</div>
+              </div>
+            </li>
+            <li>
+              <span class="node" style="--h: var(--info)"></span>
+              <div>
+                <div class="ev">Authorized</div>
+                <div class="meta">09:14:04.902 &middot; VISA-NET-EU &middot; auth 4K7T29</div>
+              </div>
+            </li>
+            <li>
+              <span class="node" style="--h: var(--ok)"></span>
+              <div>
+                <div class="ev">Captured in full</div>
+                <div class="meta">09:14:07.330 &middot; ledger entries 4 &middot; balanced</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 3. ACQUIRERS ============================== -->
+  <section>
+    <div class="sec-head">
+      <h2>Acquirer health and fault injection</h2>
+      <p>Circuit breaker state is the one place a coloured dot earns its keep.</p>
+    </div>
+
+    <div class="acq">
+      <div class="panel">
+        <div class="panel-head">
+          VISA-NET-EU
+          <span class="spacer"></span>
+          <span class="breaker closed"><span class="dot"></span>CLOSED</span>
+        </div>
+        <div class="panel-body">
+          <div class="stats">
+            <div>p95 latency<b>184 ms</b></div>
+            <div>Success<b>99.1%</b></div>
+            <div>Calls (5m)<b>412</b></div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button class="btn btn-sm btn-danger">Force timeout</button>
+            <button class="btn btn-sm">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          MC-GLOBAL
+          <span class="spacer"></span>
+          <span class="breaker open"><span class="dot"></span>OPEN</span>
+        </div>
+        <div class="panel-body">
+          <div class="stats">
+            <div>p95 latency<b>2,041 ms</b></div>
+            <div>Success<b>41.7%</b></div>
+            <div>Calls (5m)<b>96</b></div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button class="btn btn-sm btn-danger" disabled>Force timeout</button>
+            <button class="btn btn-sm">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          AMEX-DIRECT
+          <span class="spacer"></span>
+          <span class="breaker half-open"><span class="dot"></span>HALF_OPEN</span>
+        </div>
+        <div class="panel-body">
+          <div class="stats">
+            <div>p95 latency<b>703 ms</b></div>
+            <div>Success<b>88.0%</b></div>
+            <div>Calls (5m)<b>18</b></div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button class="btn btn-sm btn-danger">Force timeout</button>
+            <button class="btn btn-sm">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 4. COMPONENTS ============================= -->
+  <section>
+    <div class="sec-head">
+      <h2>Components</h2>
+      <p>Every state the console actually renders.</p>
+    </div>
+
+    <div class="grid g-2">
+      <div class="panel">
+        <div class="panel-head">Payment state</div>
+        <div class="panel-body" style="display:flex; flex-wrap:wrap; gap:8px">
+          <span class="badge badge-created">CREATED</span>
+          <span class="badge badge-pending">PENDING_3DS</span>
+          <span class="badge badge-authorized">AUTHORIZED</span>
+          <span class="badge badge-captured">CAPTURED</span>
+          <span class="badge badge-refunded">REFUNDED</span>
+          <span class="badge badge-voided">VOIDED</span>
+          <span class="badge badge-declined">DECLINED</span>
+          <span class="badge badge-disputed">DISPUTED</span>
+          <span class="badge badge-unknown">UNKNOWN</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Buttons</div>
+        <div class="panel-body" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center">
+          <button class="btn btn-primary">Capture</button>
+          <button class="btn">Void</button>
+          <button class="btn btn-danger">Refund</button>
+          <button class="btn btn-ghost">Cancel</button>
+          <button class="btn" disabled>Settle</button>
+          <button class="btn btn-sm">Small <span class="kbd">R</span></button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Form</div>
+        <div class="panel-body">
+          <div class="field">
+            <label for="amt">Refund amount</label>
+            <input class="input" id="amt" value="1284.50">
+            <span class="help">Maximum &euro; 1,284.50. Minor units, two decimals.</span>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label for="key">Idempotency key</label>
+            <input class="input" id="key" value="ord-8841-ref-01" aria-invalid="true">
+            <span class="err">Key already used with a different request body.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Alerts</div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:10px">
+          <div class="alert ok"><span class="bar"></span><div><b>Trial balance holds.</b> 1,284 entries, zero drift.</div></div>
+          <div class="alert warn"><span class="bar"></span><div><b>Breaker open on MC-GLOBAL.</b> Traffic routed to VISA-NET-EU.</div></div>
+          <div class="alert danger"><span class="bar"></span><div><b>Recon exception.</b> Batch 2026-09-02 is short by &euro; 47.20.</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Empty state</div>
+        <div class="panel-body">
+          <div class="empty">
+            <div class="glyph"></div>
+            <h3>No settlement batches yet</h3>
+            <p>Batches are cut nightly at 02:00 UTC. Run the job now to generate one from today's captures.</p>
+            <button class="btn btn-sm btn-primary">Run settlement job</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Loading</div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:12px">
+          <div class="skeleton" style="width:32%"></div>
+          <div class="skeleton" style="width:76%"></div>
+          <div class="skeleton" style="width:61%"></div>
+          <div class="skeleton" style="width:88%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 5. FOUNDATIONS ============================ -->
+  <section>
+    <div class="sec-head">
+      <h2>Foundations</h2>
+      <p>Tokens. Swap the block, the whole console follows.</p>
+    </div>
+
+    <h3 style="font-size:12px; color:var(--text-3); margin-bottom:10px">Surfaces and text</h3>
+    <div class="grid g-swatch" style="margin-bottom:28px" id="sw-neutral"></div>
+
+    <h3 style="font-size:12px; color:var(--text-3); margin-bottom:10px">Accent and semantics</h3>
+    <div class="grid g-swatch" style="margin-bottom:28px" id="sw-semantic"></div>
+
+    <h3 style="font-size:12px; color:var(--text-3); margin-bottom:10px">Type</h3>
+    <div style="margin-bottom:28px">
+      <div class="type-row"><span class="label">page title / 19</span><span style="font-size:19px; font-weight:600; letter-spacing:-.015em">Settlement and reconciliation</span></div>
+      <div class="type-row"><span class="label">section / 15</span><span style="font-size:15px; font-weight:600">Batch 2026-09-02</span></div>
+      <div class="type-row"><span class="label">body / base</span><span>Nightly batch compares expected acquirer rows against local captures.</span></div>
+      <div class="type-row"><span class="label">figure / sans</span><span class="num" style="font-size:22px; font-weight:500">&euro; 48,213.60</span></div>
+      <div class="type-row"><span class="label">identifier / sans</span><span class="num" style="font-size:12.5px">7f3ac21e-9d04-4b1a-bc77-2e08f5a91c3d</span></div>
+      <div class="type-row"><span class="label">column head / 11</span><span style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-3); font-weight:600">Merchant reference</span></div>
+    </div>
+
+    <h3 style="font-size:12px; color:var(--text-3); margin-bottom:10px">Spacing</h3>
+    <div class="scale-row">
+      <div><div style="width:4px;height:26px"></div><span>4</span></div>
+      <div><div style="width:8px;height:26px"></div><span>8</span></div>
+      <div><div style="width:12px;height:26px"></div><span>12</span></div>
+      <div><div style="width:16px;height:26px"></div><span>16</span></div>
+      <div><div style="width:24px;height:26px"></div><span>24</span></div>
+      <div><div style="width:32px;height:26px"></div><span>32</span></div>
+      <div><div style="width:56px;height:26px"></div><span>56</span></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const READS = {
+  ledger:   "A. Ledger. Paper-light, IBM Plex, ink-blue accent, 5px radius. Reads like an audit surface. Safest to defend in an interview.",
+  console:  "B. Console. Flat charcoal, no blur and no glow, one lime signal reserved for actions. Reads like modern infra tooling.",
+  terminal: "C. Terminal. Monospace throughout, zero radius, maximum density, black accent. Colour is spent only on payment state."
+};
+const NEUTRAL = ["bg", "surface", "surface-2", "border", "border-strong", "text", "text-2", "text-3"];
+const SEMANTIC = ["accent", "ok", "warn", "danger", "info", "violet", "rose", "muted"];
+
+function swatches(id, names) {
+  const cs = getComputedStyle(document.documentElement);
+  document.getElementById(id).innerHTML = names.map(n => {
+    const v = cs.getPropertyValue("--" + n).trim();
+    return `<div class="swatch">
+      <div class="chip" style="background:${v}"></div>
+      <div class="meta"><div class="name">${n}</div><div class="val">${v}</div></div>
+    </div>`;
+  }).join("");
+}
+
+function apply(name) {
+  document.documentElement.setAttribute("data-ds", name);
+  document.getElementById("read").textContent = READS[name];
+  document.querySelectorAll(".opt").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.set === name)));
+  swatches("sw-neutral", NEUTRAL);
+  swatches("sw-semantic", SEMANTIC);
+  try { localStorage.setItem("switch-ds", name); } catch (e) {}
+}
+
+document.querySelectorAll(".opt").forEach(b =>
+  b.addEventListener("click", () => apply(b.dataset.set)));
+
+let saved = "console";
+try { saved = localStorage.getItem("switch-ds") || "console"; } catch (e) {}
+apply(READS[saved] ? saved : "console");
+</script>

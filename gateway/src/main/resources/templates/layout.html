@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title layout:title-pattern="$CONTENT_TITLE - Switch Console">Switch Console</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <div class="app">
+        <nav class="sidebar">
+            <a class="brand" th:href="@{/dashboard/payments}">
+                <span class="mark" aria-hidden="true"></span>
+                Switch
+                <span class="env">LOCAL</span>
+            </a>
+
+            <ul class="nav">
+                <li class="nav-label">Operations</li>
+                <li><a class="nav-link" th:href="@{/dashboard/payments}"
+                       th:classappend="${requestURI.startsWith('/dashboard/payments') ? 'active' : ''}">Payments</a></li>
+                <li><a class="nav-link" th:href="@{/dashboard/risk}"
+                       th:classappend="${requestURI.startsWith('/dashboard/risk') ? 'active' : ''}">Risk</a></li>
+
+                <li class="nav-label">Money movement</li>
+                <li><a class="nav-link" th:href="@{/dashboard/ledger}"
+                       th:classappend="${requestURI.startsWith('/dashboard/ledger') ? 'active' : ''}">Ledger</a></li>
+                <li><a class="nav-link" th:href="@{/dashboard/settlement}"
+                       th:classappend="${requestURI.startsWith('/dashboard/settlement') ? 'active' : ''}">Settlement</a></li>
+
+                <li class="nav-label">Infrastructure</li>
+                <li><a class="nav-link" th:href="@{/dashboard/acquirers}"
+                       th:classappend="${requestURI.startsWith('/dashboard/acquirers') ? 'active' : ''}">Acquirers</a></li>
+            </ul>
+        </nav>
+
+        <main class="content" id="main">
+            <div layout:fragment="content"></div>
+        </main>
+    </div>
+</body>
+</html>

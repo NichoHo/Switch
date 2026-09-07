@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Ledger</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-head">
+        <div>
+            <h1>Ledger</h1>
+            <p>Double-entry. Debits minus credits must be zero in every currency.</p>
+        </div>
+    </div>
+
+    <div class="metrics">
+        <div class="metric" th:each="balance : ${trialBalances}">
+            <div class="k">Trial balance, <span th:text="${balance.key}">EUR</span></div>
+            <div class="v">
+                <span th:text="${#numbers.formatDecimal(balance.value / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                <span class="cur" th:text="${balance.key}">EUR</span>
+            </div>
+            <div class="d" th:text="${balance.value == 0 ? 'balanced' : 'OUT OF BALANCE'}">balanced</div>
+        </div>
+    </div>
+
+    <div class="alert alert-danger mb-5" th:if="${outOfBalance}">
+        <span class="bar"></span>
+        <div>
+            <b>The trial balance does not hold.</b>
+            A non-zero sum means an entry was written without its counterpart. Stop and find it
+            before trusting any settlement figure below.
+        </div>
+    </div>
+
+    <div class="alert alert-ok mb-5" th:unless="${outOfBalance}">
+        <span class="bar"></span>
+        <div>
+            <b>Trial balance holds in every currency.</b>
+            Debits and credits sum to zero, so no entry has been written without its counterpart.
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">Entries</div>
+        <div class="panel-body">
+            <div class="empty">
+                <div class="glyph"></div>
+                <h3>Entry browsing is not built yet</h3>
+                <p>The invariant above is computed from the real <code>ledger_entry</code> table.
+                   A paged view of individual entries still needs a repository query.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

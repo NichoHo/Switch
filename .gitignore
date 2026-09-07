@@ -1,0 +1,12 @@
+target/
+*.class
+
+*.log
+
+.jqwik-database
+
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,38 @@
+{
+  "title": "Switch Console Dashboard",
+  "uid": "switch-metrics-1",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Payments Created",
+      "targets": [
+        {
+          "expr": "sum(increase(http_server_requests_seconds_count{uri=\"/payments\"}[5m]))",
+          "legendFormat": "Count"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Decline Rate",
+      "targets": [
+        {
+          "expr": "sum(rate(switch_risk_decisions_total{decision=\"DENY\"}[5m])) / sum(rate(switch_risk_decisions_total[5m])) * 100",
+          "legendFormat": "Rate %"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Acquirer Latency (p99)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(switch_acquirer_latency_bucket[5m])) by (le, acquirer))",
+          "legendFormat": "{{acquirer}}"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 38,
+  "timezone": "browser"
+}

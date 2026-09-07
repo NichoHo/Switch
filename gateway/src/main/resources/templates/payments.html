@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Payments</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-head">
+        <div>
+            <h1>Payments</h1>
+            <p>Most recent 50, newest first.</p>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <div class="table-bar">
+            <span class="spacer"></span>
+            <span class="result">
+                <span th:text="${#lists.size(payments)}">0</span> shown
+            </span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Payment</th>
+                    <th scope="col">Merchant reference</th>
+                    <th scope="col">State</th>
+                    <th scope="col">Acquirer</th>
+                    <th scope="col">Risk</th>
+                    <th scope="col" class="num">Amount</th>
+                    <th scope="col">Created (UTC)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="payment : ${payments}">
+                    <td>
+                        <a class="id-link" th:href="@{/dashboard/payments/{id}(id=${payment.id})}"
+                           th:text="${#strings.substring(payment.id, 0, 8)}">00000000</a>
+                    </td>
+                    <td class="t2" th:text="${payment.merchantReference}">-</td>
+                    <td>
+                        <span th:class="'badge s-' + ${#strings.toLowerCase(payment.state)}"
+                              th:text="${payment.state}">CREATED</span>
+                    </td>
+                    <td class="t2" th:text="${payment.acquirerId != null ? payment.acquirerId : '-'}">-</td>
+                    <td class="t3 num" th:text="${payment.riskScore != null ? payment.riskScore : '-'}">-</td>
+                    <td class="num">
+                        <span th:text="${#numbers.formatDecimal(payment.amountMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        <span class="cur" th:text="${payment.currency}">EUR</span>
+                    </td>
+                    <td class="t3 num"
+                        th:text="${#temporals.format(payment.createdAt, 'yyyy-MM-dd HH:mm:ss', 'UTC')}">-</td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="7">
+                        <div class="empty">
+                            <div class="glyph"></div>
+                            <h3>No payments yet</h3>
+                            <p>Run <code>./seed.sh</code> to generate a demo environment, or post to
+                               <code>/v1/payments</code> with a merchant API key.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Settlement</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-head">
+        <div>
+            <h1>Settlement and reconciliation</h1>
+            <p>Batches are cut per merchant, currency, acquirer and business date.</p>
+        </div>
+    </div>
+
+    <div class="alert alert-warn mb-5" th:if="${openExceptions > 0}">
+        <span class="bar"></span>
+        <div>
+            <b><span th:text="${openExceptions}">0</span> unresolved reconciliation
+               <span th:text="${openExceptions == 1 ? 'exception' : 'exceptions'}">exceptions</span>.</b>
+            The differ found rows that do not agree between the acquirer file and the local ledger.
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <div class="table-bar">
+            <span class="spacer"></span>
+            <span class="result"><span th:text="${#lists.size(batches)}">0</span> batches</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Business date</th>
+                    <th scope="col">Acquirer</th>
+                    <th scope="col">Currency</th>
+                    <th scope="col" class="num">Gross</th>
+                    <th scope="col" class="num">Refunds</th>
+                    <th scope="col" class="num">Scheme fee</th>
+                    <th scope="col" class="num">Gateway fee</th>
+                    <th scope="col" class="num">Net</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="batch : ${batches}">
+                    <td th:text="${#temporals.format(batch.businessDate, 'yyyy-MM-dd')}">-</td>
+                    <td class="t2" th:text="${batch.acquirerId}">-</td>
+                    <td class="t3" th:text="${batch.currency}">EUR</td>
+                    <td class="num" th:text="${#numbers.formatDecimal(batch.grossMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    <td class="num t2" th:text="${#numbers.formatDecimal(batch.refundsMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    <td class="num t2" th:text="${#numbers.formatDecimal(batch.schemeFeeMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    <td class="num t2" th:text="${#numbers.formatDecimal(batch.gatewayFeeMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    <td class="num" th:text="${#numbers.formatDecimal(batch.netMinor / 100.0, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(batches)}">
+                    <td colspan="8">
+                        <div class="empty">
+                            <div class="glyph"></div>
+                            <h3>No settlement batches yet</h3>
+                            <p>Batches are cut by the nightly settlement job from captured payments.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

@@ -15,7 +15,7 @@ public class MaskingConverter extends MessageConverter {
     
     // Also redact Authorization and API key headers if accidentally logged.
     // NR-7: "Authorization: Bearer <token>" has a scheme word between the separator and the
-    // actual secret — without consuming it, the capture group greedily grabs "Bearer" itself
+    // actual secret: without consuming it, the capture group greedily grabs "Bearer" itself
     // and leaves the real token sitting in the log line untouched. The optional non-capturing
     // group eats a known scheme word first, so group 2 is always the credential, not the scheme.
     private static final Pattern HEADER_PATTERN = Pattern.compile(

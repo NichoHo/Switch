@@ -6,7 +6,7 @@ import com.switchpay.vault.store.CardTokenEntity;
 
 import java.time.Instant;
 
-/** Wire shapes for §16. Money always travels as {minor, currency} — never a bare number. */
+/** Wire shapes for §16. Money always travels as {minor, currency}, never a bare number. */
 final class ApiDtos {
     private ApiDtos() {}
 

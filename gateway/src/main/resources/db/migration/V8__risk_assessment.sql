@@ -16,7 +16,7 @@ CREATE TABLE risk_assessment (              -- insert-only (§5.2)
     created_at             TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Velocity rules query "how many of these in the last N hours" — one covering index per signal.
+-- Velocity rules query "how many of these in the last N hours": one covering index per signal.
 CREATE INDEX ON risk_assessment (pan_fingerprint, created_at);
 CREATE INDEX ON risk_assessment (ip_address, created_at) WHERE ip_address IS NOT NULL;
 CREATE INDEX ON risk_assessment (email_hash, created_at) WHERE email_hash IS NOT NULL;

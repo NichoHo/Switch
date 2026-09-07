@@ -82,8 +82,8 @@ public class PaymentService {
 
     @Transactional
     public Payment createPayment(UUID merchantId, String merchantRef, String token, Currency currency, long amount) {
-        // Checked here, not left to the FK: a token that doesn't exist — or belongs to a
-        // different merchant — must fail as a clean domain error, not a raw constraint
+        // Checked here, not left to the FK: a token that doesn't exist (or belongs to a
+        // different merchant) must fail as a clean domain error, not a raw constraint
         // violation the caller has no code to branch on.
         cardTokenRepository.findByTokenAndMerchantId(token, merchantId)
                 .orElseThrow(() -> new IllegalArgumentException("card_token_not_found"));
@@ -114,10 +114,10 @@ public class PaymentService {
     }
 
     /**
-     * §10 — the caller-supplied {@code context} (§16's request example: ip/emailHash/
+     * §10: the caller-supplied {@code context} (§16's request example: ip/emailHash/
      * deviceFingerprint) plus the card just resolved is what makes the risk rules real rather
      * than evaluating against literals (NR-10). Thresholds come from the merchant's own
-     * {@code deny_threshold}/{@code challenge_threshold}, not a hardcoded 70/40 (NR-9) — the
+     * {@code deny_threshold}/{@code challenge_threshold}, not a hardcoded 70/40 (NR-9). The
      * single-arg overload above is the only caller still getting the RiskService demo defaults,
      * and it does so because it has no context or merchant thresholds to offer instead.
      */
@@ -175,9 +175,9 @@ public class PaymentService {
     }
 
     /**
-     * §3 steps 6–7 and §9. Picks a candidate acquirer, calls it, and maps the outcome onto the
+     * §3 steps 6-7 and §9. Picks a candidate acquirer, calls it, and maps the outcome onto the
      * aggregate. The idempotency key we send is the payment id, which is the same key
-     * {@link com.switchpay.routing.StatusProbeJob} later asks the acquirer about — that
+     * {@link com.switchpay.routing.StatusProbeJob} later asks the acquirer about; that
      * correspondence is what makes an AUTH_UNKNOWN resolvable rather than a guess.
      */
     private void routeAndApply(Payment payment, PaymentEntity entity) {
@@ -253,7 +253,7 @@ public class PaymentService {
         return new PaymentWithCard(entity, card);
     }
 
-    /** The most recent 3DS challenge for a payment, if it has one — for building the §11 step 2 redirect. */
+    /** The most recent 3DS challenge for a payment, if it has one: for building the §11 step 2 redirect. */
     public java.util.Optional<UUID> findPendingChallengeId(UUID paymentId) {
         return threedsChallengeRepository.findFirstByPaymentIdOrderByCreatedAtDesc(paymentId)
                 .map(ThreedsChallengeEntity::getChallengeId);
@@ -287,7 +287,7 @@ public class PaymentService {
     /**
      * Persists the operation-level record that settlement batches over and posts the
      * corresponding ledger entry. Capture/refund on the aggregate move money nowhere by
-     * themselves (§12.2) — this is where they become real bookkeeping.
+     * themselves (§12.2). This is where they become real bookkeeping.
      */
     private void recordSettlementOperation(PaymentEntity entity, String type, long amount) {
         PaymentOperationEntity op = new PaymentOperationEntity();
@@ -313,8 +313,8 @@ public class PaymentService {
     /**
      * NR-17: this used to call the acquirer inline, holding the payment's
      * {@code PESSIMISTIC_WRITE} row lock for the duration of a network call. The capture itself
-     * is already durable at this point in the method — nothing downstream depends on the
-     * notification landing before the transaction ends — so it runs {@code afterCommit()} instead,
+     * is already durable at this point in the method (nothing downstream depends on the
+     * notification landing before the transaction ends), so it runs {@code afterCommit()} instead,
      * outside the lock. Best-effort either way: a missed notification simply surfaces as a
      * {@code MISSING_AT_ACQUIRER} recon exception later, which is the correct failure mode for an
      * acquirer that is temporarily unreachable.
@@ -373,8 +373,8 @@ public class PaymentService {
 
     /**
      * §11 step 4/5, the business logic behind {@code ThreedsCallbackController} (NR-14). The
-     * controller's job stops at reading the raw body and verifying the signature — both
-     * genuinely HTTP-layer concerns — and starts here: challenge-id binding, state and
+     * controller's job stops at reading the raw body and verifying the signature, both
+     * genuinely HTTP-layer concerns, and starts here: challenge-id binding, state and
      * expiry checks, and driving the payment through the result.
      *
      * @return whether the assertion was a successful authentication
@@ -382,7 +382,7 @@ public class PaymentService {
     @Transactional
     public boolean completeThreedsChallenge(UUID challengeId, UUID signedChallengeId, String status) {
         if (!signedChallengeId.equals(challengeId)) {
-            // The signature is valid but for a *different* challenge — someone is replaying a
+            // The signature is valid but for a *different* challenge: someone is replaying a
             // genuine assertion against the wrong URL. Reject rather than trust the path alone.
             throw new IllegalArgumentException("threeds_challenge_id_mismatch");
         }
@@ -408,7 +408,7 @@ public class PaymentService {
 
     /**
      * NR-3: this used to build a fresh {@code CREATED} aggregate and then {@code setAccessible(true)}
-     * its way into five private fields — the exact FSM protection §19.1 exists to prove was
+     * its way into five private fields: the exact FSM protection §19.1 exists to prove was
      * bypassable by anything in the same JVM, not just this class. {@link Payment#reconstitute}
      * is the real, encapsulated rehydration path; this method's only job now is the entity↔domain
      * type mapping.

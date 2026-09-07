@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-/** NR-14: depends on {@link SettlementQueryService}, not a repository — see its javadoc. */
+/** NR-14: depends on {@link SettlementQueryService}, not a repository; see its javadoc. */
 @RestController
 public class SettlementController {
 

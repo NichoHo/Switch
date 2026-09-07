@@ -18,21 +18,21 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * §16 — the payment resource.
+ * §16: the payment resource.
  *
  * Every mutating call goes through {@code IdempotencyFilter} (§7), which claims the
  * {@code Idempotency-Key} before this controller runs and replays the stored response on a
  * duplicate. Nothing here needs to know that.
  *
- * Every call — mutating or not — goes through {@code MerchantAuthFilter} first, so
+ * Every call, mutating or not, goes through {@code MerchantAuthFilter} first, so
  * {@code MerchantContext.require()} below is always a verified identity, never an asserted one
  * (NR-4). Payment-scoped endpoints additionally check that the payment belongs to the caller
- * ({@link #requireOwnership}) — authenticating the caller is not the same as authorizing them to
+ * ({@link #requireOwnership}): authenticating the caller is not the same as authorizing them to
  * touch any payment ID they happen to guess.
  *
  * NR-14: this used to inject {@code CardTokenRepository} and {@code ThreedsChallengeRepository}
  * directly to assemble its response DTOs. Both reads now live behind {@code PaymentService}
- * ({@code getPaymentWithCard}, {@code findPendingChallengeId}) — the controller's job is HTTP
+ * ({@code getPaymentWithCard}, {@code findPendingChallengeId}): the controller's job is HTTP
  * shape, not deciding how to join two tables.
  */
 @RestController
@@ -69,7 +69,7 @@ public class PaymentController {
 
         if (PaymentState.AUTHENTICATION_PENDING.name().equals(entity.getState())) {
             // §11 step 2 says 202; §17 lists authentication_required as 402. Following §17,
-            // because the error-code table is what the test suite asserts on — but the two
+            // because the error-code table is what the test suite asserts on, but the two
             // sections disagree and one of them should be corrected.
             ApiDtos.ThreedsAction action = paymentService.findPendingChallengeId(entity.getId())
                     .map(this::redirectFor)
@@ -135,7 +135,7 @@ public class PaymentController {
     }
 
     /**
-     * A payment ID belonging to another merchant is reported as not found, not as forbidden —
+     * A payment ID belonging to another merchant is reported as not found, not as forbidden:
      * confirming a payment exists for a merchant that isn't the caller is itself a leak.
      */
     private void requireOwnership(UUID paymentId, HttpServletRequest httpRequest) {
@@ -148,7 +148,7 @@ public class PaymentController {
 
     /**
      * A capture or refund denominated in another currency is a mistake, not a conversion (§5.1).
-     * {@code Money.minus()} is what actually refuses the arithmetic (NR-13) — the difference
+     * {@code Money.minus()} is what actually refuses the arithmetic (NR-13): the difference
      * itself is meaningless here and thrown away; the point is that computing it at all is only
      * legal when both amounts share a currency.
      */

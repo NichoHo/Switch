@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
  * Settles one (merchant, currency, acquirer, business_date) group.
  *
  * NR-15: this used to be a package-private method on {@code SettlementBatchJob} called via
- * {@code this.settleGroup(...)} from within the same class — Spring's transactional proxy only
+ * {@code this.settleGroup(...)} from within the same class. Spring's transactional proxy only
  * intercepts calls that arrive from *outside* the bean, so {@code @Transactional} on that method
  * was silently inert. Pulling it out into its own bean, called from {@code SettlementBatchJob}
- * through the injected reference, is what makes the proxy — and therefore the transaction —
+ * through the injected reference, is what makes the proxy, and therefore the transaction,
  * actually apply.
  */
 @Component
@@ -70,7 +70,7 @@ class SettlementGroupSettler {
         // NR-16: MERCHANT_RECEIVABLE's remaining balance for a payment, after its capture, any
         // refund (posted at refund time to REFUNDS_CLEARING) and the fee assessment below, is
         // gross − refund − fees. Settlement's job is to zero that out by moving it to
-        // MERCHANT_PAYABLE — so that is what each item's settlement posting must carry. The
+        // MERCHANT_PAYABLE, so that is what each item's settlement posting must carry. The
         // previous version posted gross − fees per item, omitting refunds entirely:
         // MERCHANT_RECEIVABLE never zeroed out when a window had any, the shortfall sat there
         // permanently, and net_minor (this same gross − refund − fees figure) didn't match what

@@ -12,7 +12,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * §10.1: "many small authorizations from one source with a rising decline rate."
  *
- * // scores on amount + IP velocity alone, not the "rising decline rate" itself — that
+ * // scores on amount + IP velocity alone, not the "rising decline rate" itself: that
  * // needs joining risk_assessment against the payment's eventual AUTH_DECLINED outcome, which
  * // isn't known yet at risk-evaluation time. Add that join the day this needs to be sharper than
  * // a blunt small-amount-velocity signal.
@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit;
 @Component
 public class CardTestingPatternRule implements RiskRule {
 
-    private static final long SMALL_AMOUNT_MINOR = 100;   // ~€1.00 — the classic testing signature
+    private static final long SMALL_AMOUNT_MINOR = 100;   // ~€1.00: the classic testing signature
     private static final long MIN_ATTEMPTS_TO_SCORE = 3;
 
     private final RiskAssessmentRepository repository;

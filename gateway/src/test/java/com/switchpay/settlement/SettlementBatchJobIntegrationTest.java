@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Proves §13.1's "Done when": a re-run does not double-settle, and the ledger stays balanced.
- * The acquirer HTTP boundary is mocked so the payment routes to a real directory entry —
+ * The acquirer HTTP boundary is mocked so the payment routes to a real directory entry,
  * which means the acquirer's cost_bps/cost_fixed_minor genuinely participate in the fee split.
  */
 @SpringBootTest
@@ -80,7 +80,7 @@ public class SettlementBatchJobIntegrationTest {
             "INSERT INTO merchant (id, name, api_key_hash, webhook_secret, rate_bps, fixed_fee_minor) VALUES (?, 'Test', 'hash', 'secret', 250, 30)",
             merchantId);
         String token = "tok_" + UUID.randomUUID().toString().replace("-", "");
-        // Unique per call, not a literal shared across every card this class inserts —
+        // Unique per call, not a literal shared across every card this class inserts:
         // VELOCITY_CARD_1H is real (NR-10); see its landmine note.
         byte[] panFingerprint = UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
         jdbcTemplate.update("""
@@ -141,7 +141,7 @@ public class SettlementBatchJobIntegrationTest {
             "INSERT INTO merchant (id, name, api_key_hash, webhook_secret, rate_bps, fixed_fee_minor) VALUES (?, 'Test', 'hash', 'secret', 250, 30)",
             merchantId);
         String token = "tok_" + UUID.randomUUID().toString().replace("-", "");
-        // Unique per call, not a literal shared across every card this class inserts —
+        // Unique per call, not a literal shared across every card this class inserts:
         // VELOCITY_CARD_1H is real (NR-10); see its landmine note.
         byte[] panFingerprint = UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
         jdbcTemplate.update("""

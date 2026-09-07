@@ -12,7 +12,7 @@ public class RiskService {
      * Used only by {@link #evaluate(RiskContext)}, kept for callers with no merchant to read
      * thresholds from (tests, mainly). Production traffic goes through
      * {@link #evaluate(RiskContext, int, int)} with the merchant's own
-     * {@code deny_threshold}/{@code challenge_threshold} (NR-9) — these are the values §10.2's
+     * {@code deny_threshold}/{@code challenge_threshold} (NR-9): these are the values §10.2's
      * demo defaults used before that existed.
      */
     private static final int DEFAULT_DENY_THRESHOLD = 70;

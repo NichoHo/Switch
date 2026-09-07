@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 /**
- * §16 — {@code POST /v1/tokens}.
+ * §16: {@code POST /v1/tokens}.
  *
  * The PAN arrives, is handed straight to the vault, and never appears in a field, a log line, or
  * a response. Only the token and safe metadata come back out.

@@ -12,7 +12,7 @@ public final class MerchantContext {
         Object merchantId = request.getAttribute(MerchantAuthFilter.MERCHANT_ID_ATTRIBUTE);
         if (merchantId == null) {
             // Reachable only if a /v1 route is called without going through the filter chain
-            // (a misconfigured test, for instance) — MerchantAuthFilter rejects everything else.
+            // (a misconfigured test, for instance): MerchantAuthFilter rejects everything else.
             throw new IllegalArgumentException("merchant_id_required");
         }
         return (UUID) merchantId;

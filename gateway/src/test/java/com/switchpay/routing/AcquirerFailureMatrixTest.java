@@ -112,7 +112,7 @@ public class AcquirerFailureMatrixTest {
         Router.RoutingResult result = r.route(req, "VISA", "EUR", "FR");
         assertThat(result.acquirerId()).isEqualTo("A1");
         assertThat(result.resultState()).isEqualTo(PaymentState.AUTH_UNKNOWN);
-        // A2 never contacted — verify no request to /a2
+        // A2 never contacted: verify no request to /a2
         verify(0, postRequestedFor(urlEqualTo("/a2/authorizations")));
     }
 

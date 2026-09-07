@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 public class SettlementFaultInjector {
 
     public record FaultConfig(
-        int dropRatePercent,             // MISSING_AT_ACQUIRER — row present internally, dropped from file
-        int phantomRatePercent,          // UNKNOWN_AT_GATEWAY — row added that the gateway never sent
+        int dropRatePercent,             // MISSING_AT_ACQUIRER: row present internally, dropped from file
+        int phantomRatePercent,          // UNKNOWN_AT_GATEWAY: row added that the gateway never sent
         int amountMismatchRatePercent,   // AMOUNT_MISMATCH
         int duplicateRatePercent,        // DUPLICATE_AT_ACQUIRER
         int currencyMismatchRatePercent, // CURRENCY_MISMATCH

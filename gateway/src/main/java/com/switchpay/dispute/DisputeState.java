@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * §14 — a separate aggregate with its own FSM, kept out of PaymentState for the reason
+ * §14: a separate aggregate with its own FSM, kept out of PaymentState for the reason
  * given in §6.3: the payment lifecycle and the dispute lifecycle run on different clocks.
  *
  * OPENED ──> EVIDENCE_SUBMITTED ──> WON | LOST

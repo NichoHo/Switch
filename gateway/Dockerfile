@@ -1,6 +1,6 @@
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
-# NR-11: docker-compose.yml builds this with `context: .` (the repo root) — COPY sources are
+# NR-11: docker-compose.yml builds this with `context: .` (the repo root), so COPY sources are
 # already relative to that root. `../pom.xml` reached outside the build context entirely, which
 # Docker refuses, so `docker compose up` could never have built this image.
 COPY pom.xml .

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Payment aggregate — pure domain model.
+ * Payment aggregate: pure domain model.
  * No Spring, no JPA, no servlet dependencies.
  */
 public class Payment {
@@ -56,7 +56,7 @@ public class Payment {
     }
 
     /**
-     * Rehydrates an aggregate from persisted state (NR-3) — no transition validation, because
+     * Rehydrates an aggregate from persisted state (NR-3): no transition validation, because
      * this isn't a domain operation, it's loading one that already happened. The only legitimate
      * caller is the persistence layer ({@code PaymentService.mapToDomain()}); reaching for this
      * instead of the operation methods above bypasses the FSM the same way reflection used to.

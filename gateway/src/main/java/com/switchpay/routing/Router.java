@@ -71,7 +71,7 @@ public class Router {
                 return new RoutingResult(candidate.id(), null, PaymentState.AUTH_UNKNOWN);
             }
             
-            // SAFE failure — try next candidate
+            // SAFE failure: try next candidate
         }
         
         throw new NoAcquirerAvailableException();

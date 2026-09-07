@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/** What the acquirer "actually processed" — the source of truth the settlement file is built from. */
+/** What the acquirer "actually processed": the source of truth the settlement file is built from. */
 @Component
 public class CaptureStore {
 

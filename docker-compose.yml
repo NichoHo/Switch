@@ -23,7 +23,7 @@ services:
       DB_HOST: postgres
       # Spring's relaxed env-var binding maps this to the acquirer.sim.url property that
       # routing/AcquirerDirectory and payment/api/PaymentController read (NR-11). Without it,
-      # the container fell back to localhost:8081 — itself, not the acquirer-sim container.
+      # the container fell back to localhost:8081 (itself, not the acquirer-sim container).
       ACQUIRER_SIM_URL: http://acquirer-sim:8081
     depends_on:
       postgres:
@@ -38,6 +38,6 @@ services:
     ports:
       - "3002:8081"
     environment:
-      # Maps to gateway.url (NR-11) — what AcsController posts its signed 3DS assertion to.
+      # Maps to gateway.url (NR-11): what AcsController posts its signed 3DS assertion to.
       # localhost inside this container is acquirer-sim itself, not the gateway.
       GATEWAY_URL: http://gateway:8080

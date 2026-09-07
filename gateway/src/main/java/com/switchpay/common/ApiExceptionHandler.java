@@ -14,7 +14,7 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * §17 — RFC 9457 {@code application/problem+json}. The {@code code} is the contract the test
+ * §17: RFC 9457 {@code application/problem+json}. The {@code code} is the contract the test
  * suite asserts on; the {@code detail} message is not.
  *
  * The domain signals its failures with the error code as the exception *message*

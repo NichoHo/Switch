@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * §11 step 3 — the fake ACS.
+ * §11 step 3: the fake ACS.
  *
  * NR-6: this previously lived in {@code com.switchpay.acquirer}, outside
  * {@link AcquirerSimApplication}'s component-scan root ({@code com.switchpay.acqsim}), so it was
- * never actually registered — every challenge redirect 404'd. It also just echoed the requested
+ * never actually registered: every challenge redirect 404'd. It also just echoed the requested
  * action back to whoever called it rather than posting anything to the gateway. It now signs its
  * assertion (§15.3's scheme) and POSTs it to {@code /3ds/callback/{challengeId}}, matching the
  * verification {@code ThreedsCallbackController} now performs.

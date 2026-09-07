@@ -9,7 +9,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * §13.2 — each of the six discrepancy types gets its own test, injecting exactly that fault
+ * §13.2: each of the six discrepancy types gets its own test, injecting exactly that fault
  * and asserting exactly that exception type (and no others) is raised. Pure domain logic:
  * no Spring, no database.
  */

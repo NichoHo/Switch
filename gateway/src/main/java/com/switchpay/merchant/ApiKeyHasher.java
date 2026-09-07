@@ -7,7 +7,7 @@ import java.util.HexFormat;
 
 /**
  * §16: API keys are "stored as a hash". A presented key is high-entropy and single-purpose
- * (unlike a password), so a plain SHA-256 lookup hash is the right tool — no salt needed to
+ * (unlike a password), so a plain SHA-256 lookup hash is the right tool: no salt needed to
  * defend against guessing, and a salt would break the O(1) {@code findByApiKeyHash} lookup this
  * exists to support.
  */

@@ -17,15 +17,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
- * §11 step 4 — the fake ACS posts its assertion here.
+ * §11 step 4: the fake ACS posts its assertion here.
  *
- * NR-6: this used to trust a bare {@code ?status=} query parameter — anyone who could guess a
+ * NR-6: this used to trust a bare {@code ?status=} query parameter. Anyone who could guess a
  * challenge UUID could grant liability shift on someone else's payment. Every assertion is now
  * required to carry a {@code Switch-Signature} header (§15.3's scheme, reused rather than
  * inventing a second one) and land inside a 5-minute freshness window.
  *
- * NR-14: everything past "is this request authentic" — challenge-id binding, state, expiry,
- * driving the payment — lives in {@code PaymentService.completeThreedsChallenge()}. This
+ * NR-14: everything past "is this request authentic" (challenge-id binding, state, expiry,
+ * driving the payment) lives in {@code PaymentService.completeThreedsChallenge()}. This
  * controller's only jobs are the two things that genuinely require {@link HttpServletRequest}:
  * reading the raw body (needed to verify the signature over exactly the bytes that were signed)
  * and checking that signature.

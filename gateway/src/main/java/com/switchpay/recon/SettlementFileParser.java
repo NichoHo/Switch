@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** `reference,amount_minor,currency,business_date` — plain CSV, no library needed for four columns. */
+/** `reference,amount_minor,currency,business_date`: plain CSV, no library needed for four columns. */
 public final class SettlementFileParser {
     private SettlementFileParser() {}
 

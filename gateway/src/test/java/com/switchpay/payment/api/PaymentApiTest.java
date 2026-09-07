@@ -38,11 +38,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * §16 over real HTTP, against real Postgres. This is the layer that did not exist before:
  * every assertion here was previously unreachable because there were no payment endpoints.
  *
- * Uses MockMvc rather than a live port — the servlet stack, JSON binding, status codes and the
+ * Uses MockMvc rather than a live port: the servlet stack, JSON binding, status codes and the
  * §17 problem-detail handler are all exercised, without needing a socket.
  *
  * Every request authenticates with a real {@code Authorization: Bearer} key hashed the same way
- * {@code MerchantAuthFilter} hashes it (NR-4) — not an asserted {@code X-Merchant-Id}, which
+ * {@code MerchantAuthFilter} hashes it (NR-4), not an asserted {@code X-Merchant-Id}, which
  * nothing here trusts any more.
  */
 @SpringBootTest

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * §12.3 invariant 1 — debits equal credits per (transaction, currency), enforced by the
+ * §12.3 invariant 1: debits equal credits per (transaction, currency), enforced by the
  * DEFERRABLE INITIALLY DEFERRED trigger in V4__ledger.sql.
  *
  * These tests must COMMIT. A deferred constraint trigger fires at commit and nowhere else, so
@@ -65,7 +65,7 @@ public class LedgerIntegrationTest {
                 entry(transactionId, ChartOfAccounts.MERCHANT_RECEIVABLE, Direction.CREDIT, 99L)
         ));
 
-        // The rows insert happily — nothing is wrong until the transaction tries to become durable.
+        // The rows insert happily: nothing is wrong until the transaction tries to become durable.
         ledgerRepository.flush();
 
         TestTransaction.flagForCommit();

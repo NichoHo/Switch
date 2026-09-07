@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 /**
- * §3 step 1 / §16 — {@code Authorization: Bearer sk_test_…}, looked up by hash.
+ * §3 step 1 / §16: {@code Authorization: Bearer sk_test_…}, looked up by hash.
  *
  * Runs before {@code IdempotencyFilter} ({@code @Order(2)}) so idempotency-key scoping is keyed
  * on a merchant identity that has actually been verified, not one a caller merely asserted. This
@@ -65,7 +65,7 @@ public class MerchantAuthFilter extends OncePerRequestFilter {
         return key.isEmpty() ? null : key;
     }
 
-    /** RFC 9457, matching {@code common/ApiExceptionHandler} — a filter cannot use @ControllerAdvice. */
+    /** RFC 9457, matching {@code common/ApiExceptionHandler}: a filter cannot use @ControllerAdvice. */
     private void writeUnauthorized(HttpServletResponse response, String detail) throws IOException {
         response.setStatus(401);
         response.setContentType("application/problem+json");

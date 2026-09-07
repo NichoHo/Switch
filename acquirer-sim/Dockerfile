@@ -1,6 +1,6 @@
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
-# NR-11: see gateway/Dockerfile — same fix, same reason.
+# NR-11: see gateway/Dockerfile, same fix, same reason.
 COPY pom.xml .
 COPY contracts ./contracts
 COPY gateway ./gateway

@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * §7 — claims the {@code Idempotency-Key} before the handler runs and replays the stored
+ * §7: claims the {@code Idempotency-Key} before the handler runs and replays the stored
  * response on a duplicate.
  *
  * Runs after {@link MerchantAuthFilter} ({@code @Order(1)}): idempotency keys are scoped per
@@ -53,7 +53,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         }
 
         // The body must be read here, before the handler, and still be readable by the handler
-        // afterwards — that is the whole reason CachedBodyRequest exists. Fingerprinting an
+        // afterwards: that is the whole reason CachedBodyRequest exists. Fingerprinting an
         // unread body silently makes every request look identical, which turns
         // idempotency_key_reuse into a replay of the wrong response.
         CachedBodyRequest cachedRequest = new CachedBodyRequest(request);
@@ -104,7 +104,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         }
     }
 
-    /** RFC 9457, matching {@code common/ApiExceptionHandler} — a filter cannot use @ControllerAdvice. */
+    /** RFC 9457, matching {@code common/ApiExceptionHandler}: a filter cannot use @ControllerAdvice. */
     private void writeProblem(HttpServletResponse response, int status, String code, String detail)
             throws IOException {
         response.setStatus(status);

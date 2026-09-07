@@ -1,4 +1,4 @@
-# Switch — Blueprint
+# Switch: Blueprint
 
 A card-payment **switch**: the authorization engine that sits between a merchant and the
 acquirers. Not a marketplace, not an escrow, not a wallet. The thing that tokenizes a card,
@@ -77,8 +77,8 @@ They will read the test suite and the state machine. Everything else is supporti
 | Framework | **Spring Boot 3.3+** | What Adyen / N26 / Trade Republic / SAP actually run |
 | Build | **Maven**, multi-module | Enterprise-Java default; single `pom.xml` per module reads clearly in review |
 | Persistence | **Spring Data JPA** + **Flyway** | JPA for the aggregate, raw SQL where the query is the point (velocity, trial balance) |
-| Database | **PostgreSQL 16** | Constraint triggers, `SKIP LOCKED`, JSONB, partial indexes — all load-bearing here |
-| Resilience | **Resilience4j** | Circuit breaker, bulkhead, retry — already in the Spring ecosystem |
+| Database | **PostgreSQL 16** | Constraint triggers, `SKIP LOCKED`, JSONB, partial indexes: all load-bearing here |
+| Resilience | **Resilience4j** | Circuit breaker, bulkhead, retry: already in the Spring ecosystem |
 | HTTP client | `RestClient` (Spring 6) | Explicit per-call timeouts, no extra dependency |
 | Templating | **Thymeleaf** + **htmx** | Server-rendered dashboard, zero frontend build step |
 | Metrics | **Micrometer** → Prometheus endpoint | Standard, scrapeable, one dependency |
@@ -92,9 +92,9 @@ segment. Catching this at design time, not at first compile.
 **Build reality as of the phase-8 audit.** Present in the POMs: Spring Boot 3.3.4 (parent), Spring
 Data JPA, Flyway, PostgreSQL driver, Resilience4j 2.2.0, JUnit 5, Testcontainers, jqwik 1.9.1,
 WireMock 3.9.1, ArchUnit 1.3.0. **Not yet added:** springdoc-openapi, Bucket4j, Thymeleaf/htmx,
-`micrometer-registry-prometheus`, PIT. Those belong to phases 9–11 and the table above is the
+`micrometer-registry-prometheus`, PIT. Those belong to phases 9-11 and the table above is the
 target, not the current dependency list. Third-party versions are pinned per-module in
-`gateway/pom.xml` rather than in a root `<dependencyManagement>` block — fine at three modules.
+`gateway/pom.xml` rather than in a root `<dependencyManagement>` block: fine at three modules.
 
 ---
 
@@ -166,7 +166,7 @@ POST /v1/payments
   9. Store idempotency response, return 201
 ```
 
-Step 8 is a single database transaction. The outbox row is written inside it — that is the whole
+Step 8 is a single database transaction. The outbox row is written inside it: that is the whole
 point of the outbox pattern, and the reason there is no message broker in this design.
 
 ---
@@ -201,7 +201,7 @@ switch/
 │       │   ├─ api/               # controllers, request/response DTOs, ThreedsSignature
 │       │   ├─ domain/            # Payment aggregate, PaymentState, Operation, PaymentEvent
 │       │   ├─ store/             # repositories, JPA entities, queries
-│       │   │                     #   (also holds the 3DS challenge entity — see below)
+│       │   │                     #   (also holds the 3DS challenge entity; see below)
 │       │   └─ PaymentContext.java  # ip / emailHash / deviceFingerprint / ipCountry from §16's request
 │       ├─ idempotency/           # filter (@Order(2)), record store, fingerprinting, StaleKeyReaper
 │       ├─ risk/
@@ -220,23 +220,23 @@ switch/
 │       ├─ outbox/                # writer + poller + HMAC signer
 │       └─ logging/               # MaskingConverter
 │   └─ src/main/resources/
-│       ├─ db/migration/          # V1__init … V8__risk_assessment — Flyway
+│       ├─ db/migration/          # V1__init … V8__risk_assessment: Flyway
 │       ├─ application.yml
 │       └─ logback-spring.xml     # masking converter
 │
 ├─ acquirer-sim/
 │   └─ src/main/java/com/switchpay/acqsim/
 │       ├─ AuthorizationController      # honours idempotency keys
-│       ├─ FaultInjector                # latency, error rate, timeout, malformed — per acquirer
+│       ├─ FaultInjector                # latency, error rate, timeout, malformed, per acquirer
 │       ├─ FaultConfigController        # PUT /admin/faults/{acquirerId}
-│       ├─ CapturesController           # POST /captures — records what the acquirer "processed"
+│       ├─ CapturesController           # POST /captures: records what the acquirer "processed"
 │       ├─ CaptureStore                 # in-memory, keyed by business date
 │       ├─ SettlementFileController     # daily CSV with injected discrepancies
 │       ├─ SettlementFaultInjector      # per-discrepancy-type injection rates
 │       ├─ AcsController                # fake 3DS challenge, signs and posts its assertion (NR-6)
 │       └─ Hmac                         # matches payment/api/ThreedsSignature's scheme independently
 │
-└─ seed/                                # NOT BUILT YET — phase 10
+└─ seed/                                # NOT BUILT YET: phase 10
     └─ seed.sh / SeedRunner.java        # realistic flows, prints a readable transcript
 ```
 
@@ -255,7 +255,7 @@ If it grows past six, the boundary is wrong.
 - **`vault/`, `ledger/`, `recon/`, `dispute/` each carry a `store/` subpackage**, matching
   `payment/store/`. Persistence types are consistently one level below their module.
 
-`merchant/` and `dashboard/` are not built (phases 10–11). `common/` currently holds only the
+`merchant/` and `dashboard/` are not built (phases 10-11). `common/` currently holds only the
 money types; problem-details and hashing helpers were never created.
 
 ---
@@ -287,7 +287,7 @@ public record Money(long minor, Currency currency) {
 | `payment_operation` | mutable (state only) | one row per authorize/capture/void/refund |
 | `payment_event` | **append-only** | audit trail; from_state → to_state |
 | `idempotency_record` | mutable | claim → complete |
-| ~~`acquirer`~~ | — | **Not a table.** The four-entry directory is a static list in `routing/AcquirerDirectory.java`; breaker state is held in the Resilience4j registry. Four rows that change only on redeploy do not earn a table, a migration, and a repository |
+| ~~`acquirer`~~ | - | **Not a table.** The four-entry directory is a static list in `routing/AcquirerDirectory.java`; breaker state is held in the Resilience4j registry. Four rows that change only on redeploy do not earn a table, a migration, and a repository |
 | `risk_assessment` | insert-only | score, decision, breakdown JSONB |
 | `threeds_challenge` | mutable | challenge lifecycle |
 | `ledger_account` | insert-only | chart of accounts |
@@ -297,7 +297,7 @@ public record Money(long minor, Currency currency) {
 | `dispute` | mutable | own FSM |
 | `outbox_event` | mutable (delivery state) | |
 
-### 5.3 Core DDL (abridged — the load-bearing parts)
+### 5.3 Core DDL (abridged: the load-bearing parts)
 
 > **`VARCHAR(n)`, never `CHAR(n)`.** The original draft of this section used `CHAR(3)` for currency
 > and `CHAR(8)/CHAR(4)/CHAR(2)` for BIN/last4/country. Postgres reports those as `bpchar`, which
@@ -447,7 +447,7 @@ asserts the database rejects it.
 | `AUTHENTICATION_FAILED` | **yes** | Challenge failed or expired |
 | `AUTHORIZED` | no | Funds reserved at the issuer |
 | `AUTH_DECLINED` | **yes** | Acquirer answered "no" |
-| `AUTH_UNKNOWN` | no | Read timeout — outcome genuinely unknown, resolution pending |
+| `AUTH_UNKNOWN` | no | Read timeout: outcome genuinely unknown, resolution pending |
 | `PARTIALLY_CAPTURED` | no | Some of the authorized amount captured |
 | `CAPTURED` | no | Fully captured (or partially captured then auth expired) |
 | `VOIDED` | **yes** | Authorization released before any capture |
@@ -462,13 +462,13 @@ the test suite enumerates.
 
 | From | Operation | To | Guard |
 |------|-----------|-----|-------|
-| `CREATED` | `RISK_DENY` | `RISK_DECLINED` | — |
-| `CREATED` | `RISK_CHALLENGE` | `AUTHENTICATION_PENDING` | — |
+| `CREATED` | `RISK_DENY` | `RISK_DECLINED` | - |
+| `CREATED` | `RISK_CHALLENGE` | `AUTHENTICATION_PENDING` | - |
 | `CREATED` | `AUTHORIZE` | `AUTHORIZED` | acquirer approved |
 | `CREATED` | `AUTHORIZE` | `AUTH_DECLINED` | acquirer declined |
 | `CREATED` | `AUTHORIZE` | `AUTH_UNKNOWN` | read timeout |
 | `AUTHENTICATION_PENDING` | `AUTHENTICATE_OK` | `CREATED` | valid callback; sets `liability_shift`, then the ordinary `AUTHORIZE` path runs |
-| `AUTHENTICATION_PENDING` | `AUTHENTICATE_FAIL` | `AUTHENTICATION_FAILED` | — |
+| `AUTHENTICATION_PENDING` | `AUTHENTICATE_FAIL` | `AUTHENTICATION_FAILED` | - |
 | `AUTHENTICATION_PENDING` | `EXPIRE` | `AUTHENTICATION_FAILED` | challenge TTL passed |
 | `AUTH_UNKNOWN` | `PROBE_RESOLVED` | `AUTHORIZED` \| `AUTH_DECLINED` | status probe answered |
 | `AUTHORIZED` | `CAPTURE` | `PARTIALLY_CAPTURED` | `0 < amt < remaining` |
@@ -536,7 +536,7 @@ reading its amounts. Optimistic `@Version` remains as a second line of defence f
 not lock.
 
 ```
-// one row lock per payment. Fine to any realistic volume — contention is per-payment,
+// one row lock per payment. Fine to any realistic volume: contention is per-payment,
 // not global. If a single payment ever sees real concurrent traffic, move to an append-only
 // operation log with the balance derived on read.
 ```
@@ -558,7 +558,7 @@ convention, because that convention is precisely what gets probed in interviews.
 | Key seen, same fingerprint, `IN_PROGRESS` | `409 request_in_progress` |
 | Key seen, **different** fingerprint | `422 idempotency_key_reuse` |
 | Key older than TTL (24h) | Treated as unseen |
-| Same key, different merchant | Independent — keys are scoped per merchant |
+| Same key, different merchant | Independent: keys are scoped per merchant |
 
 **The fingerprint** is `SHA-256(method ‖ path ‖ canonical-JSON(body))`. Canonicalisation sorts keys
 and strips insignificant whitespace, so a semantically identical body does not fingerprint
@@ -574,10 +574,10 @@ RETURNING *;
 ```
 
 Zero rows returned means someone else holds the key. No application lock, no Redis, no
-double-checked anything — a unique index under a concurrent insert is already exactly the
+double-checked anything: a unique index under a concurrent insert is already exactly the
 primitive needed.
 
-**Failure handling.** If the handler throws, the claim row is **deleted** — release is a delete,
+**Failure handling.** If the handler throws, the claim row is **deleted**: release is a delete,
 not a `FAILED` state, because nothing ever reads a terminal failure and a row that only exists to
 be ignored is a row worth not having. If the process dies mid-flight the record stays
 `IN_PROGRESS`, and `StaleKeyReaper` deletes `IN_PROGRESS` rows older than **5 minutes**, running
@@ -599,9 +599,9 @@ probe asks the acquirer "what happened to *this* key", and the acquirer can answ
 |--------|-----------|
 | AES-256-GCM ciphertext of the PAN | Plaintext PAN anywhere outside a single method scope |
 | `key_version` for rotation | The key itself (env/secret only) |
-| HMAC-SHA256 fingerprint of the PAN | — |
-| BIN (8), last4, brand, funding type, issuer country | — |
-| — | **CVV, ever, in any form.** Used for the authorization call, never persisted |
+| HMAC-SHA256 fingerprint of the PAN | - |
+| BIN (8), last4, brand, funding type, issuer country | - |
+| - | **CVV, ever, in any form.** Used for the authorization call, never persisted |
 
 ### 8.2 Isolation is enforced, not documented
 
@@ -620,7 +620,7 @@ Outside `com.switchpay.vault`, the only thing that exists is a token string and 
 
 A Logback masking converter redacts anything matching a PAN-shaped run of digits, plus known
 secret headers. The test appends an in-memory appender, runs a complete tokenize → auth →
-capture → refund flow, then regex-asserts across every captured line that no 13–19 digit run and
+capture → refund flow, then regex-asserts across every captured line that no 13-19 digit run and
 no secret ever appeared.
 
 ### 8.4 Input safety on a public demo
@@ -639,7 +639,7 @@ endpoint that would accept a real card number is a liability regardless of how w
 
 ### 8.5 Honest framing
 
-The README says: *this demonstrates PCI-adjacent design — data-flow isolation, tokenization,
+The README says: *this demonstrates PCI-adjacent design: data-flow isolation, tokenization,
 key versioning, log scrubbing, least-retention. It is not a compliance claim and has not been
 assessed.* Overclaiming here is worse than not building it.
 
@@ -649,7 +649,7 @@ assessed.* Overclaiming here is worse than not building it.
 
 ### 9.1 Acquirer directory
 
-A static list in `routing/AcquirerDirectory.java` (see §5.2 — deliberately not a table).
+A static list in `routing/AcquirerDirectory.java` (see §5.2, deliberately not a table).
 `issuer_countries` is an explicit set, not a region code, because the filter is a set membership
 test and "EU" would need expanding somewhere anyway. `cost_fixed_minor` was added in phase 8: the
 scheme-fee formula in §13.1 is bps **plus a per-transaction fixed component**, and the directory is
@@ -681,7 +681,7 @@ candidates = acquirers
 If every eligible acquirer has an open breaker, the payment fails fast with
 `no_acquirer_available` rather than queuing behind a known-dead dependency.
 
-### 9.3 Retry safety — the core distinction
+### 9.3 Retry safety: the core distinction
 
 ```
                               ┌─ connect timeout ───────┐
@@ -728,16 +728,16 @@ makes duplicate-suppression and the status probe testable end to end rather than
 
 | Rule | Signal | Typical weight |
 |------|--------|----------------|
-| `VELOCITY_CARD_1H` | Authorizations on this PAN fingerprint in the last hour | 0–35 |
-| `VELOCITY_IP_24H` | Distinct cards from this IP in 24h | 0–30 |
-| `VELOCITY_EMAIL_24H` | Authorizations for this email hash in 24h | 0–20 |
+| `VELOCITY_CARD_1H` | Authorizations on this PAN fingerprint in the last hour | 0-35 |
+| `VELOCITY_IP_24H` | Distinct cards from this IP in 24h | 0-30 |
+| `VELOCITY_EMAIL_24H` | Authorizations for this email hash in 24h | 0-20 |
 | `BIN_COUNTRY_MISMATCH` | Issuer country ≠ IP geo country | 25 |
 | `HIGH_RISK_COUNTRY` | IP country on a configured list | 20 |
-| `AMOUNT_ANOMALY` | Amount vs this merchant's 30-day p95 | 0–30 |
+| `AMOUNT_ANOMALY` | Amount vs this merchant's 30-day p95 | 0-30 |
 | `BLOCKLIST_CARD` | PAN fingerprint on the blocklist | 100 (forces DENY) |
 | `BLOCKLIST_IP` | IP on the blocklist | 100 |
 | `NEW_DEVICE_HIGH_AMOUNT` | First sighting of device fingerprint + amount over threshold | 25 |
-| `CARD_TESTING_PATTERN` | Many small authorizations from one source with a rising decline rate | 0–40 |
+| `CARD_TESTING_PATTERN` | Many small authorizations from one source with a rising decline rate | 0-40 |
 
 Each rule is a class implementing:
 
@@ -785,7 +785,7 @@ is close to the actual daily work of a risk-platform engineer.
 
 ```
 // velocity counters are Postgres range queries over a covering index. At demo volume
-// this is sub-millisecond. Real volume wants a Redis sliding window or a streaming counter —
+// this is sub-millisecond. Real volume wants a Redis sliding window or a streaming counter:
 // the RiskContext interface is where that swap would happen.
 ```
 
@@ -849,13 +849,13 @@ One method per row in `ledger/LedgerService.java`: `recordCapture`, `recordFeeAs
 `transaction_id` and writes its whole balanced set in one `saveAll`, which is what keeps the
 deferred trigger in §5.3 satisfiable. `recordSettlement` handles a negative net (refunds exceeding
 captures in a window) by swapping the debit and credit accounts rather than writing a negative
-amount — `amount_minor > 0` is a CHECK constraint, and a negative entry would be a lie about
+amount: `amount_minor > 0` is a CHECK constraint, and a negative entry would be a lie about
 direction anyway.
 
 ### 12.3 Invariants
 
 1. **Per transaction group:** `Σ debits == Σ credits` per currency. Enforced by the deferred
-   constraint trigger in §5.3 — at commit, in the database, not in a service.
+   constraint trigger in §5.3: at commit, in the database, not in a service.
 2. **Global:** the trial balance sums to zero per currency at all times. Asserted after every
    seeded scenario and exposed as a Prometheus gauge that should never leave zero.
 3. **Append-only:** no `UPDATE` or `DELETE` on `ledger_entry`. A correction is a reversing entry.
@@ -898,7 +898,7 @@ selects operations still marked `settlement_state = 'UNSETTLED'`, so a second ru
 already-settled group finds nothing and writes no batch row at all.
 
 **Where the state lives.** `payment_operation.settlement_state` (`UNSETTLED | SETTLED`, added in
-`V7__settlement_and_recon.sql`) — on the operation, never on the payment, per §6.3. Refund
+`V7__settlement_and_recon.sql`): on the operation, never on the payment, per §6.3. Refund
 operations are marked `SETTLED` by the same batch that nets them out.
 
 **Fee arithmetic** is `settlement/FeeModel.java`: `round(amount × bps / 10000) + fixed`, applied
@@ -909,7 +909,7 @@ acquirer costs from the directory in §9.1.
 ### 13.2 Reconciliation
 
 `acquirer-sim` exposes `GET /settlement-files/{date}.csv` returning what the acquirer *claims*
-happened — and it deliberately injects discrepancies:
+happened, and it deliberately injects discrepancies:
 
 | Injected discrepancy | Expected detection |
 |---------------------|--------------------|
@@ -924,7 +924,7 @@ The recon job diffs the file against internal records and writes typed `recon_ex
 severity and a suggested action. Exceptions are resolvable (with an actor and note) but never
 deleted.
 
-**File format** — four columns, no library, because four columns do not need one
+**File format**: four columns, no library, because four columns do not need one
 (`recon/SettlementFileParser.java`):
 
 ```
@@ -939,7 +939,7 @@ fault type fires at most once per file, so a live demo shows one clean example r
 of noise.
 
 **The differ is pure.** `recon/ReconDiffer.diff(internal, file, expectedDate)` is a static function
-over two lists — no Spring, no database, no HTTP. That is what makes "exactly this exception type
+over two lists: no Spring, no database, no HTTP. That is what makes "exactly this exception type
 and no others" cheap to assert: `ReconDifferTest` has one test per discrepancy type plus a
 clean-match case proving zero false positives, and the whole class runs in milliseconds.
 
@@ -964,7 +964,7 @@ OPENED ──> EVIDENCE_SUBMITTED ──> WON | LOST
 The payment row carries `dispute_state` denormalised for display and filtering only; it is never
 read to make a decision.
 
-Built exactly like the payment FSM and for the same reason — `DisputeState` + `DisputeOperation`
+Built exactly like the payment FSM and for the same reason: `DisputeState` + `DisputeOperation`
 enums with a static `Map<DisputeState, Set<DisputeOperation>>`, and `DisputeFsmTest` enumerates the
 full `state × operation` cross product the same way §19.1 does. The evidence window is **14 days**
 (`DisputeService.EVIDENCE_WINDOW_DAYS`); `DisputeExpiryJob` runs hourly and drives any `OPENED`
@@ -1021,7 +1021,7 @@ is exactly the state set: `payment.authorized`, `payment.captured`, `payment.par
 cannot ship without its event, which is the point.
 
 The cost of deriving them: the names track internal state labels rather than a curated public
-vocabulary (`payment.auth_declined`, not `payment.declined`), and every transition emits — including
+vocabulary (`payment.auth_declined`, not `payment.declined`), and every transition emits, including
 ones a merchant has no use for. Worth a mapping layer if these ever become a published contract.
 
 Plus `settlement.completed`, emitted by `SettlementBatchJob` with the batch id and business date.
@@ -1047,8 +1047,8 @@ The **Built** column is the audit's finding, not a plan.
 | `GET` | `/v1/payments/{id}` | Current state + amounts + acquirer + risk summary | yes |
 | `GET` | `/v1/payments` | Filter by state and merchant reference | yes (no date/acquirer filter) |
 | `GET` | `/v1/payments/{id}/events` | Full append-only audit trail | yes |
-| `GET` | `/v1/payments/{id}/risk` | Score, decision, per-rule breakdown | **no** — `risk_assessment` exists and is populated (NR-9 resolved), the endpoint to read it back was not part of that fix |
-| `POST` | `/3ds/callback/{challengeId}?status=` | ACS assertion (see §11 — **unsigned**) | yes |
+| `GET` | `/v1/payments/{id}/risk` | Score, decision, per-rule breakdown | **no**: `risk_assessment` exists and is populated (NR-9 resolved), the endpoint to read it back was not part of that fix |
+| `POST` | `/3ds/callback/{challengeId}?status=` | ACS assertion (see §11, **unsigned**) | yes |
 | `GET` | `/v1/settlements` · `/{batchId}` | Batches and items | yes |
 | `POST` | `/admin/settlement/run?businessDate=` | Trigger a settlement batch | yes |
 | `GET` | `/v1/reconciliation/exceptions` | Open exceptions | yes |
@@ -1122,7 +1122,7 @@ asserts on. Error codes are part of the contract; error *messages* are not.
 | `payment_state_invalid` | 409 | Transition not in the table |
 | `capture_exceeds_authorized` | 422 | Amount above remaining authorization |
 | `refund_exceeds_captured` | 422 | Amount above net captured |
-| `void_after_capture` | 409 | Explicit, distinct from generic state error — it is the FAQ |
+| `void_after_capture` | 409 | Explicit, distinct from generic state error: it is the FAQ |
 | `idempotency_key_reuse` | 422 | Same key, different payload |
 | `request_in_progress` | 409 | Key currently held |
 | `payment_authorization_unknown` | 409 | Payment is in `AUTH_UNKNOWN`; wait for resolution |
@@ -1131,18 +1131,18 @@ asserts on. Error codes are part of the contract; error *messages* are not.
 | `authentication_required` | 402 | 3DS challenge issued (with `action` payload) |
 | `pan_not_a_test_card` | 422 | Public-demo safety rule |
 | `currency_mismatch` | 422 | Operation currency ≠ payment currency |
-| `rate_limited` | 429 | Bucket4j — **not built** (phase 11) |
+| `rate_limited` | 429 | Bucket4j: **not built** (phase 11) |
 
 Implemented by `common/ApiExceptionHandler.java` as a `@RestControllerAdvice` returning Spring's
-`ProblemDetail`, with `code` as a custom property. `PaymentApiTest` asserts the code — never the
-message — for `payment_state_invalid`, `capture_exceeds_authorized`, `currency_mismatch`,
+`ProblemDetail`, with `code` as a custom property. `PaymentApiTest` asserts the code, never the
+message, for `payment_state_invalid`, `capture_exceeds_authorized`, `currency_mismatch`,
 `pan_not_a_test_card` and `payment_not_found`.
 
 `idempotency_key_reuse` and `request_in_progress` are decided inside `IdempotencyFilter` rather
-than the advice — a filter runs before Spring MVC's exception-handling machinery exists for a
+than the advice: a filter runs before Spring MVC's exception-handling machinery exists for a
 request, so it writes the same problem+json shape by hand instead of throwing into
 `ApiExceptionHandler`. Both are exercised by `IdempotencyFilterTest`. `payment_authorization_unknown`
-still has no thrower — a capture attempt on an `AUTH_UNKNOWN` payment currently surfaces as the more
+still has no thrower: a capture attempt on an `AUTH_UNKNOWN` payment currently surfaces as the more
 generic `payment_state_invalid`.
 
 One code was added that this table did not anticipate: `invalid_path_parameter` (400), for a path
@@ -1158,7 +1158,7 @@ watches:
 
 | Metric | Type | Why |
 |--------|------|-----|
-| `switch_auth_total{acquirer,brand,result}` | counter | Approval rate — the number the business cares about |
+| `switch_auth_total{acquirer,brand,result}` | counter | Approval rate: the number the business cares about |
 | `switch_acquirer_latency_seconds{acquirer}` | histogram | p50/p99 per acquirer |
 | `switch_acquirer_failover_total{from,to,reason}` | counter | Is routing actually working |
 | `switch_circuit_breaker_state{acquirer}` | gauge | |
@@ -1175,7 +1175,7 @@ reconstructible from the database alone.
 
 **Logs:** structured JSON, masking converter applied, no PAN, no CVV, no secrets. Ever.
 
-**Dashboards:** a Grafana dashboard JSON committed to `docs/grafana/`, importable. Not hosted —
+**Dashboards:** a Grafana dashboard JSON committed to `docs/grafana/`, importable. Not hosted:
 free tier does not justify a Grafana instance. A screenshot goes in the README.
 
 ---
@@ -1186,7 +1186,7 @@ This is the deliverable. Everything above exists to make this section possible.
 
 ### 19.1 Exhaustive state-machine test
 
-Not a sample of interesting cases — the full cross product.
+Not a sample of interesting cases: the full cross product.
 
 ```java
 @TestFactory
@@ -1207,8 +1207,8 @@ Stream<DynamicTest> every_state_operation_pair_behaves_per_the_table() {
 }
 ```
 
-13 states × **10** operations = **130** generated tests, all named, all visible in the CI output —
-the `Operation` enum ended up with `PROBE_RESOLVED` and both `AUTHENTICATE_*` variants as
+13 states × **10** operations = **130** generated tests, all named, all visible in the CI output.
+The `Operation` enum ended up with `PROBE_RESOLVED` and both `AUTHENTICATE_*` variants as
 first-class members rather than the eight this section first assumed. With the seven named cases
 below, `PaymentStateTransitionTest` reports **137**. Adding a state without deciding its
 transitions breaks the build.
@@ -1265,7 +1265,7 @@ and it is uncommon enough in a portfolio repo to be worth a conversation on its 
 ### 19.5 Real database, always
 
 Testcontainers Postgres 16 for every integration test. **Not H2.** H2 would silently ignore the
-deferred constraint trigger and parts of the CHECK behaviour — which is to say, it would skip
+deferred constraint trigger and parts of the CHECK behaviour: which is to say, it would skip
 exactly the code this project is about. One shared container per suite keeps it fast.
 
 Dedicated tests bypass the service layer and write invalid rows via raw SQL, asserting the
@@ -1277,7 +1277,7 @@ database itself rejects them:
 
 **A deferred constraint must be tested against a real commit.** The second of those tests
 originally asserted on `flush()` inside the usual rolled-back test transaction, where a
-`DEFERRABLE INITIALLY DEFERRED` trigger never fires — it passed while proving nothing. It now
+`DEFERRABLE INITIALLY DEFERRED` trigger never fires: it passed while proving nothing. It now
 uses `TestTransaction.flagForCommit()` / `end()` to force the commit inline, and asserts the
 trigger's own message (`ledger transaction … unbalanced in …`) appears in the cause chain, so a
 different failure cannot be mistaken for the invariant holding. A third case covers the subtler
@@ -1317,17 +1317,17 @@ path, and `acquirer-sim` is asserted to hold **exactly one** authorization for t
 | No class outside `com.switchpay.vault..` references `PanCipher` or `Pan` | `vault/VaultArchitectureTest` | yes |
 | `..payment.domain..` does not depend on Spring, JPA, or `javax/jakarta.servlet` | `payment/domain/PaymentDomainArchTest` | yes |
 | No `@Modifying` query, and no `delete*`/`update*` method, on a `..ledger.store..` repository | `architecture/ArchitectureTest` | yes |
-| Controllers do not depend on repositories directly | — | **no** — see "Needs Review" |
-| Every mutating `@RestController` method requires `Idempotency-Key` | — | **no** (no mutating `/v1` endpoints exist yet) |
+| Controllers do not depend on repositories directly | - | **no**: see "Needs Review" |
+| Every mutating `@RestController` method requires `Idempotency-Key` | - | **no** (no mutating `/v1` endpoints exist yet) |
 
 The ledger rule is expressed as `noMethods().that().areDeclaredInClassesThat()…` rather than the
-`classes().should().notHaveMethodsThat()` form sketched earlier — the latter is not in ArchUnit's
+`classes().should().notHaveMethodsThat()` form sketched earlier: the latter is not in ArchUnit's
 fluent API. It currently covers `ledger_entry` only; `payment_event` has no equivalent guard.
 
 ### 19.9 Log-scrubbing test
 
 Run tokenize → authorize → capture → refund with an in-memory appender attached. Regex-assert
-across every captured line: no 13–19 digit run, no `cvv`, no API key, no webhook secret.
+across every captured line: no 13-19 digit run, no `cvv`, no API key, no webhook secret.
 
 ### 19.10 Mutation testing
 
@@ -1350,7 +1350,7 @@ golden file. The last step means the demo cannot silently rot.
 someone who has never seen the repo understands it in ninety seconds.
 
 ```
-▸ SCENARIO 03 — Partial capture, partial refund
+▸ SCENARIO 03: Partial capture, partial refund
   POST /v1/tokens                      → tok_9f3c…  VISA •••• 4242  (GB, credit)
   POST /v1/payments        EUR 50.00   → AUTHORIZED     acquirer=VISA-NET-EU  risk=18 ALLOW
   POST /…/captures         EUR 30.00   → PARTIALLY_CAPTURED
@@ -1388,7 +1388,7 @@ eighteen.
 ## 21. Dashboard and design system
 
 Read-only operator console. Server-rendered Thymeleaf plus htmx for partial refreshes. **No
-frontend build step** — no npm, no bundler, no `node_modules` in a Java repo.
+frontend build step**: no npm, no bundler, no `node_modules` in a Java repo.
 
 ### 21.1 Screens
 
@@ -1407,7 +1407,7 @@ time out, run a payment, watch it fail over and the breaker open in real time.
 
 ### 21.2 Design direction
 
-Dark operator console. The register is *calm and information-dense* — Adyen's Customer Area,
+Dark operator console. The register is *calm and information-dense*: Adyen's Customer Area,
 Stripe's dashboard, a trading terminal. Not a marketing page. Nothing bounces. Nothing gradients.
 Money is monospaced and right-aligned, because a column of amounts that does not line up is a
 column you cannot scan.
@@ -1416,7 +1416,7 @@ column you cannot scan.
 
 ```css
 :root {
-  /* surface — near-black with a cool cast, not pure #000 */
+  /* surface: near-black with a cool cast, not pure #000 */
   --bg:            #0b0d10;
   --surface:       #12151a;
   --surface-raised:#181c23;
@@ -1428,11 +1428,11 @@ column you cannot scan.
   --text-muted:    #98a1b0;
   --text-faint:    #5d6675;
 
-  /* accent — a single restrained blue; the UI is not the product */
+  /* accent: a single restrained blue; the UI is not the product */
   --accent:        #4c8dff;
   --accent-quiet:  #1b2a45;
 
-  /* semantic payment states — one hue per lifecycle meaning, used everywhere */
+  /* semantic payment states: one hue per lifecycle meaning, used everywhere */
   --st-created:    #7c8798;   /* neutral, undecided        */
   --st-pending:    #c99a3a;   /* amber, waiting on someone */
   --st-authorized: #4c8dff;   /* blue, reserved not moved  */
@@ -1470,28 +1470,28 @@ at a glance.
 
 ### 21.4 Components
 
-**State badge** — pill, 11px uppercase with letter-spacing, `color-mix(in srgb, var(--st-x) 18%, transparent)`
+**State badge**: pill, 11px uppercase with letter-spacing, `color-mix(in srgb, var(--st-x) 18%, transparent)`
 background and the full-strength colour as text and 1px border. One component, driven entirely by
 the state token, so a new state cannot be styled inconsistently.
 
-**State timeline** — vertical rail on the payment detail page. Each event: a 8px dot in its state
+**State timeline**: vertical rail on the payment detail page. Each event: a 8px dot in its state
 colour, the transition `FROM → TO` in mono, actor, reason code, relative and absolute timestamp.
-Failed or rejected attempts appear in the rail too, dimmed and struck — the console shows what was
+Failed or rejected attempts appear in the rail too, dimmed and struck: the console shows what was
 *attempted*, not only what succeeded.
 
-**Table** — 32px rows, `--fs-sm`, 1px `--border` between rows, no zebra striping, sticky header,
+**Table**: 32px rows, `--fs-sm`, 1px `--border` between rows, no zebra striping, sticky header,
 hover raises to `--surface-raised`. Numeric columns right-aligned and monospaced. Density over
 comfort: an operator scanning 200 rows wants more rows, not more padding.
 
-**Money** — always `€ 49.99` with the symbol in `--text-faint` and the figure in `--text`, so the
+**Money**: always `€ 49.99` with the symbol in `--text-faint` and the figure in `--text`, so the
 eye lands on the number. Minor units never leak to the UI.
 
-**Metric tile** — label in `--fs-xs` `--text-muted` uppercase, value in `--fs-2xl` mono, delta
+**Metric tile**: label in `--fs-xs` `--text-muted` uppercase, value in `--fs-2xl` mono, delta
 underneath. Used for approval rate, p99 latency, open recon exceptions, and the trial balance
-(which shows `0.00` in `--st-captured`, and flips to `--st-declined` on any non-zero — the one
+(which shows `0.00` in `--st-captured`, and flips to `--st-declined` on any non-zero, the one
 place in the UI that shouts).
 
-**Acquirer health chip** — name, breaker state dot, p99 latency, last-hour approval rate.
+**Acquirer health chip**: name, breaker state dot, p99 latency, last-hour approval rate.
 
 ### 21.5 Accessibility
 
@@ -1519,7 +1519,7 @@ and filters, `prefers-reduced-motion` respected for the htmx swap transitions.
 
 **Memory (~512 MB).** JVM flags in the Dockerfile: `-XX:MaxRAMPercentage=70 -XX:+UseSerialGC
 -Xss512k -XX:TieredStopAtLevel=1`. SerialGC beats G1 on a small single-core heap. Spring AOT
-processing and CDS archives cut startup meaningfully — worth doing, and worth mentioning.
+processing and CDS archives cut startup meaningfully: worth doing, and worth mentioning.
 
 **Cold start.** Free web services spin down when idle and take tens of seconds to come back. The
 health ping mitigates it; the README states it plainly rather than leaving a reviewer to conclude
@@ -1555,8 +1555,8 @@ One command to a working system is a hard requirement, and CI enforces it.
 
 ## 23. Delivery phases
 
-Each phase is independently demoable and leaves the build green. Phases 0–5 alone are already a
-credible submission; 6–11 are upside.
+Each phase is independently demoable and leaves the build green. Phases 0-5 alone are already a
+credible submission; 6-11 are upside.
 
 | Phase | Scope | Done when |
 |-------|-------|-----------|
@@ -1584,21 +1584,21 @@ continuity a later phase has with an earlier one. Two rules keep that continuity
 **Contracts freeze on the phase that defines them.** `PaymentState` and the transition table
 (Phase 2), the ledger chart of accounts and posting rules (Phase 5), and everything in
 `contracts/` are the interfaces every later phase builds against. A later phase does not change
-their public shape to suit itself — if a later phase genuinely needs a change, that is a blueprint
+their public shape to suit itself. If a later phase genuinely needs a change, that is a blueprint
 amendment first, not a silent code-only change, because the phases built before it may already
 depend on the shape being different.
 
 **A phase is done at green, not at "looks done."** Before a phase counts as complete: its own
 tests (the "Done when" column above) pass against real Postgres via Testcontainers, and the seed
-scenarios that exercise it (§20) still golden-match. The next phase — likely a different model,
-likely a different day — starts from that green state and needs only: this blueprint, the section
+scenarios that exercise it (§20) still golden-match. The next phase, likely a different model,
+likely a different day, starts from that green state and needs only: this blueprint, the section
 covering its phase, and the code already committed. It should never need to re-derive a decision
 this document already made.
 
 One practical consequence: since Phases 2, 3, 4, and 5 are the ones an invariant mistake is most
 expensive in (everything downstream assumes them), and they're also where a weaker model is most
 likely to produce confident-but-wrong concurrency or money-math code, it's worth running the
-§19 test suite for exactly those phases again — not just once at the end — before starting
+§19 test suite for exactly those phases again, not just once at the end, before starting
 Phase 6, rather than discovering a race-condition bug five phases later under a pile of code that
 now also depends on it.
 
@@ -1608,31 +1608,31 @@ That advice went unheeded, and §23.2 is what it cost.
 
 The build is green on `mvn -B clean test` for everything below marked ✅. "Partial" means the
 module exists and its own unit tests pass, but a "Done when" criterion from §23 is not genuinely
-met — the detail is in "Needs Review".
+met: the detail is in "Needs Review".
 
 | Phase | Status | Note |
 |-------|--------|------|
-| **0** Foundation | ✅ | Modules, Flyway V1–V8, Testcontainers, CI. `docker compose up` builds and wires both services — NR-11 **resolved** |
-| **1** Vault | ✅ | Tokenize/Luhn/AES-GCM/fingerprint/BIN all real. Log-masking regex fixed — NR-7 **resolved** |
-| **2** Payment core | ✅ | 137 FSM tests, property tests, DB CHECK tests green. REST surface added (NR-1 resolved); aggregate rehydration no longer uses reflection — NR-3 **resolved** |
+| **0** Foundation | ✅ | Modules, Flyway V1-V8, Testcontainers, CI. `docker compose up` builds and wires both services: NR-11 **resolved** |
+| **1** Vault | ✅ | Tokenize/Luhn/AES-GCM/fingerprint/BIN all real. Log-masking regex fixed: NR-7 **resolved** |
+| **2** Payment core | ✅ | 137 FSM tests, property tests, DB CHECK tests green. REST surface added (NR-1 resolved); aggregate rehydration no longer uses reflection: NR-3 **resolved** |
 | **3** Idempotency | ✅ | Filter fingerprints the real body, both codes reachable over HTTP (NR-5 resolved), and merchant identity is a verified `Authorization: Bearer` key, not an asserted header (NR-4 resolved) |
-| **4** Acquirer + routing | ✅ | `Router` now drives every authorization; failover, decline-is-terminal and AUTH_UNKNOWN attribution proven end to end — NR-2 resolved |
+| **4** Acquirer + routing | ✅ | `Router` now drives every authorization; failover, decline-is-terminal and AUTH_UNKNOWN attribution proven end to end: NR-2 resolved |
 | **5** Ledger | ✅ | Postings correct, deferred trigger proven against a real commit (NR-8 resolved), `Money` wired into the one call site that needed it (NR-13 resolved) |
 | **6** Risk + 3DS | ✅ | All 10 rules real against `risk_assessment` history, thresholds read per-merchant, full breakdown persisted (NR-9, NR-10 resolved), 3DS callback verifies a signature, challenge binding, freshness and replay (NR-6 resolved) |
 | **7** Outbox + webhooks | ✅ | Transactional write, `SKIP LOCKED` poller, HMAC, backoff, dead-lettering all green |
-| **8** Settlement + recon | ✅ | All six discrepancy types proven, re-run does not double-settle, disputes green. All three of my own defects fixed — NR-15, NR-16, NR-17 **resolved** |
-| **9–11** | not started | Controllers now depend only on services, with an ArchUnit rule to keep it that way as Phase 9 adds more — NR-14 **resolved** |
+| **8** Settlement + recon | ✅ | All six discrepancy types proven, re-run does not double-settle, disputes green. All three of my own defects fixed: NR-15, NR-16, NR-17 **resolved** |
+| **9-11** | not started | Controllers now depend only on services, with an ArchUnit rule to keep it that way as Phase 9 adds more: NR-14 **resolved** |
 
-Phase 8 also had to repair six defects from phases 0–7 that prevented the application from starting
-against a real database at all — missing imports in `PaymentService`, a nonexistent ArchUnit method,
+Phase 8 also had to repair six defects from phases 0-7 that prevented the application from starting
+against a real database at all: missing imports in `PaymentService`, a nonexistent ArchUnit method,
 `CHAR`/`VARCHAR` schema-validation mismatches, an unmapped JSONB column, two constructors on
 `AcquirerDirectory`, and a hardcoded `seq = 1` on every `payment_event` insert. That last one made
 any payment with more than one event violate `UNIQUE (payment_id, seq)`, which is to say: no
 payment had ever been authorized *and* captured in the same process before phase 8.
 
 Every item raised in the phase-8 audit (§27) is now resolved except NR-12's performance half (test
-suite speed — the fragmented Postgres image versions it also named are fixed) and two environmental
-WireMock test failures root-caused but not fixable from application code — see "Still-failing
+suite speed, the fragmented Postgres image versions it also named are fixed) and two environmental
+WireMock test failures root-caused but not fixable from application code: see "Still-failing
 tests" at the end of §27.
 
 ---
@@ -1660,7 +1660,7 @@ Named here so their absence reads as a decision rather than an oversight.
 
 | # | Risk | Mitigation |
 |---|------|-----------|
-| R1 | Scope is large; phases 9–11 may not land | Phases 0–5 are independently complete and demoable. Ship in order, stop wherever the runway ends |
+| R1 | Scope is large; phases 9-11 may not land | Phases 0-5 are independently complete and demoable. Ship in order, stop wherever the runway ends |
 | R2 | Free-tier cold start makes the live demo look broken | Health-ping cron, honest README note, a "waking up" state in the dashboard rather than a hanging spinner |
 | R3 | Free-tier terms change | Compose + seed script is the primary demo path; the hosted URL is a bonus, and the README never depends on it |
 | R4 | The deferred constraint trigger is unusual and could surprise under bulk inserts | Covered by dedicated tests; batch settlement inserts are grouped per transaction id and committed per group |
@@ -1679,7 +1679,7 @@ The README is read before the code and decides whether the code gets read at all
    Boot / Postgres."
 2. **A 20-second GIF** of the dashboard: a payment authorized, the primary acquirer forced to time
    out, failover, breaker opening.
-3. **Run it** — three commands, nothing else.
+3. **Run it**: three commands, nothing else.
 4. **What is interesting here**, four bullets, each linking directly to the test file that proves it:
    - a payment cannot be driven into an invalid state → the exhaustive FSM test
    - a duplicate request never double-charges, even under concurrency → the 20-thread test
@@ -1702,10 +1702,10 @@ Divergences found in the phase-8 audit that were **not** written into the sectio
 each one looks like a decision made to get something working rather than because it is right.
 Ordered by how much of this blueprint's claim they undermine.
 
-**NR-1, NR-2 and NR-8 have since been fixed** — kept here with their findings intact, because what
+**NR-1, NR-2 and NR-8 have since been fixed**: kept here with their findings intact, because what
 was wrong and why matters more than a tidy list. Everything else is still open.
 
-### Structural — the request path in §3 does not exist end to end
+### Structural: the request path in §3 does not exist end to end
 
 **NR-1 · No public payment API at all.** ✅ **RESOLVED**
 *Was:* `payment/api/` contained exactly one controller, `ThreedsCallbackController`. No
@@ -1714,15 +1714,15 @@ was wrong and why matters more than a tidy list. Everything else is still open.
 nothing to render into and §20's scenarios had nothing to call.
 *Now:* `payment/api/{PaymentController,TokenController,ApiDtos,MerchantHeader}` implement the §16
 surface, `common/ApiExceptionHandler` implements §17, and `PaymentApiTest` drives all of it over
-MockMvc against real Postgres — tokenize → authorize → partial capture → partial refund, the
+MockMvc against real Postgres: tokenize → authorize → partial capture → partial refund, the
 events trail, list filtering, and five error codes. Two notes: `GET /v1/payments/{id}/risk` is
 still missing because it needs the table in NR-9, and the tokenize response is asserted not to
 echo the PAN back.
 
 **NR-2 · The router is built but never invoked.** ✅ **RESOLVED**
 *Was:* `PaymentService` called `payment.authorize("stub-acquirer", "stub-ref", "123456", …)` with
-literals, so `routing/Router` — capability filtering, cost ordering, breaker checks, SAFE/UNSAFE
-failover, `AUTH_UNKNOWN` — was wired to nothing, and every G3 claim rested on
+literals, so `routing/Router` (capability filtering, cost ordering, breaker checks, SAFE/UNSAFE
+failover, `AUTH_UNKNOWN`) was wired to nothing, and every G3 claim rested on
 `AcquirerFailureMatrixTest` driving `Router` directly. `"stub-acquirer"` is not in the directory,
 so settlement computed a **zero scheme fee** for every payment.
 *Now:* `PaymentService.routeAndApply()` resolves the card token, builds an `AuthorizationRequest`
@@ -1735,14 +1735,14 @@ decline being terminal with no failover, and directory exhaustion raising `no_ac
 
 **NR-3 · The aggregate is loaded by reflection.** ✅ **RESOLVED**
 *Was:* `PaymentService.mapToDomain()` constructed a fresh `CREATED` `Payment` and then
-`setAccessible(true)`'d its way into five private fields — the exact FSM protection §19.1 exists
+`setAccessible(true)`'d its way into five private fields: the exact FSM protection §19.1 exists
 to prove was bypassable, by reflection, from anywhere in the same JVM. It also silently dropped
 `expiresAt` on every reload (never restored) and left `Payment.authorize()`'s `acquirerId`/
 `acquirerRef`/`authCode` parameters unused, since those were written onto the JPA entity by a
 separate code path.
 *Now:* `Payment.reconstitute(...)` is a proper (package-visible-only-in-intent, enforced by
 convention and javadoc rather than the package system, since the persistence layer is a different
-package) rehydration path — a private full-state constructor plus a static factory, no
+package) rehydration path: a private full-state constructor plus a static factory, no
 `setAccessible`, no transition validation bypass beyond what rehydrating *already-happened* state
 legitimately requires. `expiresAt` is now restored correctly as a side effect of doing this
 properly. `mapToDomain()` is now nine lines of type mapping.
@@ -1752,14 +1752,14 @@ properly. `mapToDomain()` is now nine lines of type mapping.
 **NR-4 · Merchant identity comes from an unauthenticated header.** ✅ **RESOLVED**
 *Was:* `IdempotencyFilter` read `X-Merchant-Id` and trusted it; §3 step 1 and §16 both specify an
 API-key hash lookup, and the `merchant/` package that was to hold it didn't exist. Any caller could
-claim to be any merchant — including for idempotency-key scoping and, worse, for reading or
+claim to be any merchant: including for idempotency-key scoping and, worse, for reading or
 mutating any payment by ID regardless of who created it.
 *Now:* `merchant/{MerchantEntity,MerchantRepository,ApiKeyHasher,MerchantAuthFilter,MerchantContext}`.
 `MerchantAuthFilter` (`@Order(1)`) verifies `Authorization: Bearer sk_test_…` against a SHA-256
 lookup hash for every `/v1/**` request and rejects anything else with `401 unauthorized` before a
 controller ever runs; `IdempotencyFilter` (`@Order(2)`) now reads the merchant id it set as a
 request attribute instead of trusting the header itself. `PaymentController` additionally checks
-payment ownership on every payment-scoped endpoint (capture/refund/void/get/events) — reachable
+payment ownership on every payment-scoped endpoint (capture/refund/void/get/events): reachable
 authentication is not the same as being authorized to touch a payment ID you can merely guess, and
 a payment belonging to another merchant now reports `404 payment_not_found`, not `403`, so its
 existence isn't leaked either. Proven in `PaymentApiTest` (a request with no key, an unknown key,
@@ -1769,7 +1769,7 @@ keys rather than an asserted UUID).
 
 **NR-5 · The idempotency fingerprint is computed over an empty body.** ✅ **RESOLVED**
 *Was:* `IdempotencyFilter` wrapped the request in `ContentCachingRequestWrapper` and read the cache
-*before* `filterChain.doFilter()` had read the body — that cache only populates on read, so it was
+*before* `filterChain.doFilter()` had read the body: that cache only populates on read, so it was
 always empty. Every JSON request fingerprinted identically, and "same key, different body → 422
 `idempotency_key_reuse`" silently degraded to "return the first response". `IdempotencyServiceTest`
 never caught it because all seven of its tests call `IdempotencyService` directly with hand-built
@@ -1785,7 +1785,7 @@ recognised as the same request.
 Two adjacent defects surfaced by making this real and are fixed alongside it:
 
 - **Canonicalisation didn't canonicalise nested objects.** `RequestFingerprint` parsed the body
-  with `readTree()` and serialised the resulting `JsonNode` — but `JsonNode` serialises through
+  with `readTree()` and serialised the resulting `JsonNode`, but `JsonNode` serialises through
   `JsonNodeSerializer`, which does not consult `SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS` (only
   `MapSerializer` does). A payload with reordered keys inside a nested `amount` object fingerprinted
   differently from the "same" request and was rejected as reuse. Fixed by deserialising into `Object`
@@ -1794,7 +1794,7 @@ Two adjacent defects surfaced by making this real and are fixed alongside it:
 - **A stored response is not required to be byte-identical to the original.** `response_body` is a
   `jsonb` column; Postgres re-serialises jsonb with its own key order (by length, then lexically)
   and its own spacing on the way back out. Two test assertions compared the replayed body to the
-  original by exact string equality and failed on formatting alone — including a **pre-existing**
+  original by exact string equality and failed on formatting alone, including a **pre-existing**
   failure in `IdempotencyServiceTest.testSameKeyTwiceSequentially` that predates this fix. Both now
   compare parsed JSON trees (`IdempotencyFilterTest`) or ignore whitespace
   (`IdempotencyServiceTest`).
@@ -1802,29 +1802,29 @@ Two adjacent defects surfaced by making this real and are fixed alongside it:
   hit the `payment_card_token_fkey` constraint directly, surfacing as an unhandled 500
   (`DataIntegrityViolationException`) rather than the `card_token_not_found` 404 the token is
   validated against a few steps later in `routeAndApply()`. It now checks
-  `cardTokenRepository.findByTokenAndMerchantId` up front — the same rule `routeAndApply()` already
+  `cardTokenRepository.findByTokenAndMerchantId` up front: the same rule `routeAndApply()` already
   enforces, just early enough that a bad request never reaches the database. Caught by
   `IdempotencyFilterTest.a_client_error_is_stored_and_replayed_rather_than_re_executed`, which needs
   a clean 4xx to prove that a client error is cached and replayed rather than re-executed.
 
 **NR-6 · The 3DS callback verifies nothing.** ✅ **RESOLVED**
 *Was:* `POST /3ds/callback/{challengeId}?status=` transitioned the payment on the strength of a
-bare query parameter — anyone who could guess a challenge UUID could grant liability shift on
+bare query parameter: anyone who could guess a challenge UUID could grant liability shift on
 someone else's payment. `threeds_challenge.expires_at` was written but never read. Separately,
 `acquirer-sim`'s `AcsController` lived in package `com.switchpay.acquirer` while
-`AcquirerSimApplication` scans from `com.switchpay.acqsim` — outside the scan root, so the fake ACS
+`AcquirerSimApplication` scans from `com.switchpay.acqsim`: outside the scan root, so the fake ACS
 endpoint was never registered at all, and what existed just echoed the requested action back to
 the caller rather than posting anywhere.
 *Now:* `payment/api/ThreedsSignature` implements §15.3's `t=…,v1=hmac-sha256(t + "." + body)`
-scheme — reused rather than inventing a second signing format for the same problem — and
+scheme (reused rather than inventing a second signing format for the same problem) and
 `ThreedsCallbackController` requires it: missing signature, wrong signature, a stale timestamp
 (>5 minutes), a signed body whose `challengeId` doesn't match the path, and a replay against an
 already-resolved challenge are each rejected with their own §17 code before the payment is
 touched. `acquirer-sim`'s `AcsController` moved into `com.switchpay.acqsim` (so it's actually
 scanned) and now signs its assertion with a matching `Hmac` utility and POSTs it to
-`/3ds/callback/{challengeId}` instead of just replying to the caller. `ThreedsFlowTest` — previously
+`/3ds/callback/{challengeId}` instead of just replying to the caller. `ThreedsFlowTest`, previously
 broken (mocked repositories, no Testcontainers, and calling a method signature that no longer
-exists) — now drives a real `CHALLENGE` decision through the live risk engine and proves all seven
+exists), now drives a real `CHALLENGE` decision through the live risk engine and proves all seven
 cases: successful assertion authorizes the payment with `liabilityShift: true`, a failed one leaves
 it `AUTHENTICATION_FAILED`, and the five rejection cases above each surface their own code.
 
@@ -1834,8 +1834,8 @@ name, so `Authorization: Bearer secret-token-123` masked the word `Bearer` and p
 `LogScrubbingTest.headersAreScrubbedFromLogs` failed on exactly this.
 *Now:* the pattern optionally consumes a known scheme word (`Bearer`/`Basic`/`Token`) between the
 separator and the credential, so the capture group is always the secret, never the scheme. The
-test still doesn't perform the tokenize → auth → capture → refund flow §8.3 and §19.9 describe —
-it logs two hand-written strings and calls the converter directly — which is a smaller, separate
+test still doesn't perform the tokenize → auth → capture → refund flow §8.3 and §19.9 describe.
+It logs two hand-written strings and calls the converter directly, which is a smaller, separate
 gap left as-is rather than folded into this fix.
 
 ### Correctness of the claims this project is built on
@@ -1844,40 +1844,40 @@ gap left as-is rather than folded into this fix.
 *Was:* `LedgerIntegrationTest.unbalancedTransactionShouldThrowException` failed with "Expected
 DataIntegrityViolationException to be thrown, but nothing was thrown". Being a `@DataJpaTest`, the
 transaction rolled back rather than committing, and a `DEFERRABLE INITIALLY DEFERRED` constraint
-only fires at COMMIT — `flush()` cannot reach it. G4, the project's headline claim, had no passing
+only fires at COMMIT: `flush()` cannot reach it. G4, the project's headline claim, had no passing
 test behind it.
 *Now:* the test commits via `TestTransaction.flagForCommit()` / `end()` and asserts the trigger's
 own message and transaction id appear in the cause chain, so an unrelated failure cannot be
 mistaken for the invariant holding. A third case was added for two legs that cancel numerically but
-differ in currency — still an imbalance, because the trigger groups by currency. See §19.5.
+differ in currency: still an imbalance, because the trigger groups by currency. See §19.5.
 
 **NR-9 · Risk thresholds are hardcoded; the per-rule breakdown is never persisted.** ✅ **RESOLVED**
 *Was:* `RiskService` compared against literal `70`/`40`; `merchant.deny_threshold`/
 `challenge_threshold` (V1, defaults 80/60) were dead columns, and there was no `risk_assessment`
-table at all — only a bare `risk_decision`/`risk_score` landed on the payment row, so no decision
+table at all: only a bare `risk_decision`/`risk_score` landed on the payment row, so no decision
 was explainable after the fact and Phase 9 (shadow mode, backtesting) had nothing to read.
 *Now:* `V8__risk_assessment.sql` adds the table. `RiskService.evaluate(context, denyThreshold,
-challengeThreshold)` is the production path — `PaymentService.authorize()` reads the calling
+challengeThreshold)` is the production path: `PaymentService.authorize()` reads the calling
 merchant's own thresholds and passes them through, so per-merchant tuning is real; the single-arg
 `evaluate(context)` keeps the old 70/40 as documented demo defaults for callers with no merchant to
-read from. `RiskDecision` now carries a full `List<RuleAssessment>` — every rule's code, score and
-reason, not only the ones that fired — and `RiskAssessmentRecorder` persists one row per
+read from. `RiskDecision` now carries a full `List<RuleAssessment>`, every rule's code, score and
+reason, not only the ones that fired, and `RiskAssessmentRecorder` persists one row per
 assessment: fingerprint, IP, email hash, device fingerprint, amount, score, decision, both
-thresholds, and the breakdown as JSONB. `RiskEngineTest`'s three tests needed zero changes — the
+thresholds, and the breakdown as JSONB. `RiskEngineTest`'s three tests needed zero changes: the
 70/40 defaults they exercise are unchanged, only where they live moved.
 
 **NR-10 · Four of the ten risk rules are stubs.** ✅ **RESOLVED**
 *Was:* `VelocityCard1HRule`, `VelocityIp24HRule`, `VelocityEmail24HRule` and `CardTestingPatternRule`
 all `return new RuleOutcome(0, "ok")` unconditionally. `PaymentService.authorize()` built every
-`RiskContext` from hardcoded values — `"192.168.1.1"`, `"emailhash"`, `"US"`, `"US"`,
-`isNewDevice = false` — and never read the card token it had just resolved, so
+`RiskContext` from hardcoded values (`"192.168.1.1"`, `"emailhash"`, `"US"`, `"US"`,
+`isNewDevice = false`) and never read the card token it had just resolved, so
 `BIN_COUNTRY_MISMATCH` compared `"US"` to `"US"` for every payment on earth.
 *Now:* the three velocity rules and the card-testing rule query `risk_assessment` history for real
-(one covering index per signal, per §10.5's own performance note — now actually true rather than
+(one covering index per signal, per §10.5's own performance note, now actually true rather than
 aspirational). `BIN_COUNTRY_MISMATCH` and `NEW_DEVICE_HIGH_AMOUNT` receive the card's real
 `issuer_country` and a real `isNewDevice` computed from whether `risk_assessment` has ever seen this
-device fingerprint before. The signal values themselves — IP, email hash, device fingerprint, IP
-country — come from a new optional `context` object on `POST /v1/payments` (`payment/PaymentContext`,
+device fingerprint before. The signal values themselves, IP, email hash, device fingerprint, IP
+country, come from a new optional `context` object on `POST /v1/payments` (`payment/PaymentContext`,
 `ApiDtos.ContextDto`), matching §16's own request example; a field the caller doesn't supply simply
 means the rule that depends on it doesn't fire, rather than guessing. `CardTestingPatternRule`
 scores on amount + IP velocity rather than the "rising decline rate" §10.1 names, and the code notes
@@ -1890,7 +1890,7 @@ One test-fixture defect this exposed, fixed where it actually broke something: s
 `card_token` rows directly with a shared literal `decode('00','hex')` fingerprint. That was inert
 while velocity rules were stubs; once `VELOCITY_CARD_1H` started querying real history, every
 payment authorized against that literal within one Testcontainers-backed test class started
-accumulating shared velocity score. `ThreedsFlowTest` — the one test asserting an exact score — now
+accumulating shared velocity score. `ThreedsFlowTest`, the one test asserting an exact score, now
 generates a unique fingerprint per test method. The other fixtures using the same literal still
 pass (their assertions don't pin an exact score), but they're carrying the same latent landmine.
 
@@ -1898,25 +1898,25 @@ pass (their assertions don't pin an exact score), but they're carrying the same 
 
 **NR-11 · `docker compose up` cannot work.** ✅ **RESOLVED**
 *Was:* both Dockerfiles did `COPY ../pom.xml .` while `docker-compose.yml` builds them with
-`context: .` (the repo root) — `../` reaches outside the build context, which Docker refuses
+`context: .` (the repo root): `../` reaches outside the build context, which Docker refuses
 outright. Even past that, the gateway container had no `ACQUIRER_SIM_URL`, so it would have
 resolved `http://localhost:8081` inside its own container instead of the acquirer-sim container.
 *Now:* both Dockerfiles `COPY` from the context root directly (no `../`). `docker-compose.yml` sets
 `ACQUIRER_SIM_URL=http://acquirer-sim:8081` on gateway and `GATEWAY_URL=http://gateway:8080` on
-acquirer-sim — Spring's relaxed env-var binding maps both straight onto the `@Value` properties
+acquirer-sim: Spring's relaxed env-var binding maps both straight onto the `@Value` properties
 those services already read, no code changes needed. Gateway now `depends_on` both postgres
 (healthy) and acquirer-sim (started). **Verified, not just asserted:** `docker compose build`
-built both images successfully. `seed.sh` remains genuinely out of scope — it's Phase 10's, named
+built both images successfully. `seed.sh` remains genuinely out of scope: it's Phase 10's, named
 as such in §4's repository tree, and building it wasn't part of what NR-11 found broken.
 
 **NR-12 · Testcontainers: a container per test class, on three different images.** *(half resolved)*
 *Was:* `SwitchApplicationTests` used `postgres:16`, `IdempotencyServiceTest` used
 `postgres:16-alpine`, everything else used `postgres:15-alpine`.
 *Now:* all thirteen `@Container` declarations use `postgres:16-alpine`, matching
-`docker-compose.yml`'s own choice — the concrete inconsistency §19.5 and this finding both named.
+`docker-compose.yml`'s own choice: the concrete inconsistency §19.5 and this finding both named.
 **Deliberately not attempted:** true container sharing (one instance for the whole suite, not one
-per class). The test classes mix two incompatible wiring styles — manual
-`@DynamicPropertySource` and Spring Boot's auto-wiring `@ServiceConnection` — and unifying thirteen
+per class). The test classes mix two incompatible wiring styles: manual
+`@DynamicPropertySource` and Spring Boot's auto-wiring `@ServiceConnection`. Unifying thirteen
 files under one singleton risks subtle port-reuse bugs for a performance-only win, at exactly the
 moment this project is handing off to Phase 9. Fixing the image was the load-bearing half of this
 finding; the speed optimization is named here rather than silently dropped.
@@ -1925,55 +1925,55 @@ finding; the speed optimization is named here rather than silently dropped.
 *Was:* `common/Money.java` was referenced by nothing. Amounts moved through the whole system as
 bare `long` plus `String` currency; §5.1's claim that `Money` "refuses arithmetic across
 currencies" refused nothing, because nothing called it.
-*Now:* `PaymentController.requireSameCurrency()` — the one place in the codebase whose entire job
-is refusing a cross-currency operation — builds two `Money` instances and calls `.minus()`. The
+*Now:* `PaymentController.requireSameCurrency()` (the one place in the codebase whose entire job
+is refusing a cross-currency operation) builds two `Money` instances and calls `.minus()`. The
 difference is discarded; the point is that computing it at all is only legal same-currency, which
 is exactly what `Money.requireSame()` already enforced and nothing had ever exercised. Left alone,
-deliberately: threading `Money` through `LedgerService`/`FeeModel`/`SettlementBatchJob` — the
-actual money-math core, proven correct and balanced across NR-8, NR-9/10, NR-15/16 — for an
+deliberately: threading `Money` through `LedgerService`/`FeeModel`/`SettlementBatchJob` (the
+actual money-math core, proven correct and balanced across NR-8, NR-9/10, NR-15/16) for an
 abstraction those call sites don't need would be a large, risky refactor for no behavioural gain.
 
 **NR-14 · Controllers inject repositories directly.** ✅ **RESOLVED**
 *Was:* `ThreedsCallbackController` took `PaymentRepository` and `ThreedsChallengeRepository`;
 `SettlementController` took two repositories; `PaymentController` took `CardTokenRepository` and
 `ThreedsChallengeRepository` to build the `card` block and the 3DS redirect. `DisputeController`
-and `ReconController` were already clean — only the payment and settlement surfaces had drifted.
-*Now:* the reads live behind services — `PaymentService.withCard()`/`findPendingChallengeId()`,
+and `ReconController` were already clean: only the payment and settlement surfaces had drifted.
+*Now:* the reads live behind services: `PaymentService.withCard()`/`findPendingChallengeId()`,
 `PaymentService.completeThreedsChallenge()` (which also absorbed `ThreedsCallbackController`'s
 entire challenge-validation logic, leaving the controller only the two things that genuinely need
 `HttpServletRequest`: reading the raw body and checking its signature), and a new
-`SettlementQueryService`. `ArchitectureTest.controllersShouldNotDependOnRepositoriesDirectly` — a
+`SettlementQueryService`. `ArchitectureTest.controllersShouldNotDependOnRepositoriesDirectly` (a
 `noClasses().that().areAnnotatedWith(RestController.class).should().dependOnClassesThat()
-.haveSimpleNameEndingWith("Repository")` rule — is what stops a fourth controller from
+.haveSimpleNameEndingWith("Repository")` rule) is what stops a fourth controller from
 reintroducing this during Phase 9, which is exactly when a stray `@Autowired Repository` is most
 likely to sneak back in.
 
 ### Defects I introduced in phase 8
 
 **NR-15 · `SettlementBatchJob.settleGroup` has no transaction.** ✅ **RESOLVED**
-*Was:* `runForDate()` called `settleGroup()` on `this`, so Spring's transactional proxy — which
-only intercepts calls arriving from *outside* the bean — never saw the call, and `@Transactional`
+*Was:* `runForDate()` called `settleGroup()` on `this`, so Spring's transactional proxy, which
+only intercepts calls arriving from *outside* the bean, never saw the call, and `@Transactional`
 on `settleGroup` was silently inert.
 *Now:* the settling logic moved to its own bean, `SettlementGroupSettler`, called from
-`SettlementBatchJob` through the injected reference. That's what makes the proxy — and therefore
-the transaction — actually apply; `SettlementBatchJob` is now purely the group-enumeration driver.
+`SettlementBatchJob` through the injected reference. That's what makes the proxy, and therefore
+the transaction, actually apply; `SettlementBatchJob` is now purely the group-enumeration driver.
 
 **NR-16 · `settlement_batch.net_minor` does not reconcile to the ledger.** ✅ **RESOLVED**
 *Was:* the settlement posting was `gross − fees` per item, omitting refunds entirely.
-`MERCHANT_RECEIVABLE` never zeroed out for a payment whenever its window had a refund — the
-shortfall sat there permanently — and `net_minor` (`gross − refunds − fees`) silently stopped
+`MERCHANT_RECEIVABLE` never zeroed out for a payment whenever its window had a refund, the
+shortfall sat there permanently, and `net_minor` (`gross − refunds − fees`) silently stopped
 matching what had actually moved to `MERCHANT_PAYABLE`. The trial balance stayed zero throughout,
 because every individual posting was still internally balanced; the bug was in *which* accounts
 carried the residual, not in the double-entry invariant itself.
 *Now:* refunds are grouped by the payment they belong to and netted into that payment's own
-settlement item (`itemNet = itemGross − itemRefund − itemScheme − itemGateway`) — correct, and
+settlement item (`itemNet = itemGross − itemRefund − itemScheme − itemGateway`): correct, and
 per-payment traceable, for the case this codebase actually exercises: one capture per payment.
 `SettlementBatchJobIntegrationTest.settlement_nets_out_refunds_so_merchant_receivable_actually_zeroes`
 proves it by querying `ledger_entry` directly for `MERCHANT_RECEIVABLE` scoped to one payment
-after a capture-then-refund settles, and asserting the balance is exactly zero — not merely that
+after a capture-then-refund settles, and asserting the balance is exactly zero, not merely that
 the trial balance elsewhere is. A comment documents the one narrowing this carries: a
 payment captured more than once within a single settlement run would have each of its items net
-the *full* refund total against itself, double-counting — not a path anything here produces today.
+the *full* refund total against itself, double-counting, not a path anything here produces today.
 Also addressed: `runForDate` sweeping all unsettled captures regardless of age (catch-up rather
 than strict day-bucketing) was already a deliberate choice, now said so at the call site instead
 of only in this document.
@@ -1983,14 +1983,14 @@ of only in this document.
 `@Transactional` capture was open, holding a `PESSIMISTIC_WRITE` row lock on the payment for the
 duration of a network call.
 *Now:* `TransactionSynchronizationManager.registerSynchronization(...).afterCommit()` defers the
-notification until the transaction has actually committed — the capture is already durable by
+notification until the transaction has actually committed: the capture is already durable by
 then, and nothing downstream depends on the notification landing before the transaction ends. Same
 best-effort failure mode as before (a missed notification surfaces as `MISSING_AT_ACQUIRER` later),
 just no longer holding a lock hostage to a network call.
 
 ### Still-failing tests
 
-`mvn clean test` now runs **238 tests** total (237 gateway + 1 acquirer-sim), of which **2 fail** —
+`mvn clean test` now runs **238 tests** total (237 gateway + 1 acquirer-sim), of which **2 fail**,
 down from 3 at the last count, and every remaining one is environmental, not application logic.
 `LogScrubbingTest` and both `IdempotencyServiceTest`/`ThreedsFlowTest` gaps named in earlier
 versions of this section are gone: fixed alongside NR-7, NR-5 and NR-6 respectively, each because
@@ -2002,10 +2002,10 @@ verifying the real fix required fixing the test that was supposed to catch it in
 | `AcquirerFailureMatrixTest` | Same root cause | root-caused, not fixable from application code |
 
 Both fail with the same stack trace: `java.net.SocketException: Invalid argument: connect` inside
-`sun.nio.ch.PipeImpl$Initializer$LoopbackConnector` — a known JDK-on-Windows NIO bug that hits
+`sun.nio.ch.PipeImpl$Initializer$LoopbackConnector`: a known JDK-on-Windows NIO bug that hits
 Jetty's internal selector-wakeup pipe, which is how WireMock's embedded server starts up. The
 standard `-Djava.net.preferIPv4Stack=true` workaround was tried and did not fix it. The machine has
-an active `vEthernet (WSL (Hyper-V firewall))` adapter, which is Docker Desktop's WSL2 backend —
+an active `vEthernet (WSL (Hyper-V firewall))` adapter, which is Docker Desktop's WSL2 backend:
 a plausible source of the loopback interference, though not proven beyond the adapter being
 present and active. Going further (disabling the adapter, changing firewall rules, touching WSL
 networking) would mean modifying system or security settings, which is out of bounds regardless of
@@ -2016,13 +2016,13 @@ routing, idempotency, 3DS, settlement, disputes and the outbox provable on a mac
 WireMock's sockets don't work, and leaves wire-level acquirer behaviour to the two tests where it
 actually belongs.
 
-`acquirer-sim`'s own suite (1 test, its Spring context load) is unaffected and passes — run
+`acquirer-sim`'s own suite (1 test, its Spring context load) is unaffected and passes: run
 separately since the gateway module's failures above stop the multi-module reactor before it's
 reached.
 
 ---
 
-*Blueprint version 1.5 — 2026-08-08. Every remaining item from the phase-8 audit (§27) resolved
+*Blueprint version 1.5: 2026-08-08. Every remaining item from the phase-8 audit (§27) resolved
 except NR-12's performance half, deliberately left open (see NR-12). NR-11: Docker Compose fixed
 and `docker compose build` verified to actually succeed. NR-13: `Money` wired into the one
 cross-currency guard that needed it. NR-14: controllers no longer touch repositories, enforced by
@@ -2031,9 +2031,9 @@ own bean. NR-16: settlement now nets refunds per payment and zeroes `MERCHANT_RE
 by a new ledger-level test. NR-17: the capture transaction no longer holds a row lock through an
 HTTP call. Also fixed in this round: NR-3 (reflection-based rehydration replaced with a
 `Payment.reconstitute` factory) and NR-7 (the masking regex now consumes an `Authorization: Bearer`
-scheme word before capturing the secret). A latent test-fixture bug — a card-fingerprint literal
+scheme word before capturing the secret). A latent test-fixture bug, a card-fingerprint literal
 shared across test methods, harmless while risk rules were stubs but a real source of
-cross-contamination once NR-10 made them query history — was found and fixed in 7 files. Full
+cross-contamination once NR-10 made them query history, was found and fixed in 7 files. Full
 suite: 238 tests, 2 failures, both WireMock/Jetty loopback issues root-caused to a JDK-on-Windows
 NIO bug and left unfixed as out of scope (see "Still-failing tests" above). Version 1.4, same day:
 NR-4, NR-6, NR-9 and NR-10 fixed: real merchant authentication (a `merchant/` package, replacing a

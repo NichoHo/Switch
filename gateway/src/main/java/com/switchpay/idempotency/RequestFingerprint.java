@@ -15,7 +15,7 @@ public class RequestFingerprint {
             if (body != null && !body.isBlank()) {
                 // readTree()+writeValueAsString(JsonNode) looks like it canonicalises but does
                 // not: ORDER_MAP_ENTRIES_BY_KEYS is consulted by MapSerializer, and a JsonNode
-                // tree serialises through JsonNodeSerializer instead, which ignores it — nested
+                // tree serialises through JsonNodeSerializer instead, which ignores it: nested
                 // objects keep their original key order regardless of the feature flag.
                 // Deserialising into Object (LinkedHashMap/List/scalars) and re-serialising that
                 // goes through the real MapSerializer at every nesting level, which does sort.

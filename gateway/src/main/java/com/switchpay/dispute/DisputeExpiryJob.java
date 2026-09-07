@@ -23,7 +23,7 @@ public class DisputeExpiryJob {
         this.disputeService = disputeService;
     }
 
-    @Scheduled(fixedDelay = 3_600_000)  // hourly — dispute deadlines run in days, not seconds
+    @Scheduled(fixedDelay = 3_600_000)  // hourly: dispute deadlines run in days, not seconds
     public void expireOverdueDisputes() {
         List<DisputeEntity> overdue = disputeRepository.findByStateAndEvidenceDueAtBefore(
             DisputeState.OPENED.name(), Instant.now());

@@ -14,11 +14,11 @@ import java.util.UUID;
 
 /**
  * Nightly settlement batch (§13.1). Idempotent by (merchant, currency, acquirer, business_date):
- * a re-run only ever finds unsettled captures, and a group with none produces no batch row —
+ * a re-run only ever finds unsettled captures, and a group with none produces no batch row:
  * the unique index on settlement_batch is the backstop, not the primary mechanism.
  *
  * Enumerates groups only; {@link SettlementGroupSettler} does the actual (transactional) work of
- * settling one — see its javadoc for why that split matters (NR-15).
+ * settling one; see its javadoc for why that split matters (NR-15).
  */
 @Component
 public class SettlementBatchJob {
@@ -39,10 +39,10 @@ public class SettlementBatchJob {
     }
 
     public void runForDate(LocalDate businessDate) {
-        // a missed night's run isn't lost — the next run's cutoff still covers every
+        // a missed night's run isn't lost: the next run's cutoff still covers every
         // capture that's still UNSETTLED, however old, and stamps it with the businessDate it
         // actually ran for. That's a deliberate choice (catch-up over strict day-bucketing), not
-        // an oversight — a system that reliably runs nightly never notices the difference.
+        // an oversight: a system that reliably runs nightly never notices the difference.
         Instant cutoff = businessDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
         // one query to enumerate groups, N to settle them. Fine at demo volume;
         // batch the settle-group work in one SQL pass if this ever runs over millions of captures.

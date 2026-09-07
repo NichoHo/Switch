@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Risk rules' view of history — every velocity signal in §10.1 is a query against this table. */
+/** Risk rules' view of history: every velocity signal in §10.1 is a query against this table. */
 @Repository
 public interface RiskAssessmentRepository extends JpaRepository<RiskAssessmentEntity, UUID> {
 

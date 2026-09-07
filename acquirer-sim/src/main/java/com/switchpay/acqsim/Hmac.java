@@ -7,7 +7,7 @@ import java.util.HexFormat;
 
 /**
  * Same {@code t=…,v1=hmac-sha256(t + "." + body)} scheme the gateway uses for outbound webhooks
- * (§15.3) and now verifies on the 3DS callback (NR-6) — one algorithm, matched independently on
+ * (§15.3) and now verifies on the 3DS callback (NR-6): one algorithm, matched independently on
  * each side rather than shared as a library between two deployables for four lines of code.
  */
 final class Hmac {

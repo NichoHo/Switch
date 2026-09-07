@@ -38,7 +38,7 @@ public class IdempotencyService {
             return new ClaimResult.Claimed();
         }
 
-        // Conflict — someone else holds this key. Fetch the existing record.
+        // Conflict: someone else holds this key. Fetch the existing record.
         IdempotencyRecordEntity existing = repository.findByMerchantIdAndIdempotencyKey(merchantId, key)
                 .orElseThrow(() -> new IllegalStateException("Conflict but no record found"));
 

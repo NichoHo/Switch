@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 /**
  * §11 step 5 / NR-6: the ACS assertion posted back to {@code /3ds/callback} must be signed, not
  * trusted on the strength of a query parameter. Same {@code t=…,v1=hmac-sha256(t + "." + body)}
- * scheme as §15.3's webhook signature — one convention, two callers, rather than inventing a
+ * scheme as §15.3's webhook signature: one convention, two callers, rather than inventing a
  * second signing format for what is structurally the same problem.
  */
 final class ThreedsSignature {

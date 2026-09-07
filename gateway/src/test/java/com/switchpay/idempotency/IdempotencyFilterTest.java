@@ -78,7 +78,7 @@ public class IdempotencyFilterTest {
 
     /**
      * The stored response comes back out of a {@code jsonb} column, and Postgres re-serialises
-     * jsonb with its own key order (by length, then lexically) and its own spacing — a faithful
+     * jsonb with its own key order (by length, then lexically) and its own spacing: a faithful
      * replay is not required to be byte-identical to the original response, only equivalent.
      */
     private void assertSameJson(String actual, String expected) throws Exception {
@@ -104,7 +104,7 @@ public class IdempotencyFilterTest {
 
     private String insertCardToken(UUID merchantId) {
         String token = "tok_" + UUID.randomUUID().toString().replace("-", "");
-        // Unique per call, not a literal shared across every card this class inserts —
+        // Unique per call, not a literal shared across every card this class inserts:
         // VELOCITY_CARD_1H is real (NR-10); see its landmine note.
         byte[] panFingerprint = UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
         jdbcTemplate.update("""
@@ -191,7 +191,7 @@ public class IdempotencyFilterTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        // Same request, reformatted — §7 says canonicalisation must see through this.
+        // Same request, reformatted: §7 says canonicalisation must see through this.
         String second = postPayment(key, """
                 {
                     "capture" : false,
@@ -244,7 +244,7 @@ public class IdempotencyFilterTest {
         postPayment(key, body).andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("card_token_not_found"));
 
-        // 4xx is a real answer about a real request — replaying it is correct, and cheaper
+        // 4xx is a real answer about a real request: replaying it is correct, and cheaper
         // than re-running the handler to reach the same conclusion.
         postPayment(key, body).andExpect(status().isNotFound());
     }

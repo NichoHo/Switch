@@ -10,11 +10,11 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Persists what {@link RiskService#evaluate} decided, so §10.2's promise — a decision explainable
- * six months later — is something the database can actually answer, and so velocity rules have
+ * Persists what {@link RiskService#evaluate} decided, so §10.2's promise, a decision explainable
+ * six months later, is something the database can actually answer, and so velocity rules have
  * history to query (NR-10).
  *
- * Ruleset versioning (§10.3–10.4: shadow mode, backtesting) is Phase 9.
+ * Ruleset versioning (§10.3-10.4: shadow mode, backtesting) is Phase 9.
  */
 @Component
 public class RiskAssessmentRecorder {

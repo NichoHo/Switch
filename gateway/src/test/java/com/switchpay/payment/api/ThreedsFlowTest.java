@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * §11 over real HTTP, against real Postgres.
  *
  * The original version of this class predates real Testcontainers wiring anywhere in this
- * package — it mocked {@code PaymentRepository}/{@code ThreedsChallengeRepository} and called
+ * package. It mocked {@code PaymentRepository}/{@code ThreedsChallengeRepository} and called
  * {@code controller.callback(challengeId, "SUCCESS")} directly, which only proved that a mock
  * records a call. It could not have caught NR-6 (no signature verification existed to catch) and
  * stopped compiling the moment the controller's signature changed to take a signed body instead
@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class ThreedsFlowTest {
 
-    // Matches ThreedsCallbackController's @Value default — no override needed to prove the
+    // Matches ThreedsCallbackController's @Value default: no override needed to prove the
     // out-of-the-box demo path actually works end to end.
     private static final String THREEDS_SECRET = "demo-3ds-shared-secret-do-not-use-in-prod";
 
@@ -94,7 +94,7 @@ public class ThreedsFlowTest {
 
         cardToken = "tok_" + UUID.randomUUID().toString().replace("-", "");
         // A fingerprint unique per test, not the shared literal other test fixtures in this repo
-        // use — VELOCITY_CARD_1H is real now (NR-10), so a fingerprint every test method shared
+        // use: VELOCITY_CARD_1H is real now (NR-10), so a fingerprint every test method shared
         // would accumulate history across methods in this class and drift the score this test
         // pins to 50.
         byte[] panFingerprint = UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
@@ -191,7 +191,7 @@ public class ThreedsFlowTest {
         String paymentId = createChallengedPayment();
         UUID challengeId = challengeIdFor(paymentId);
         long now = Instant.now().getEpochSecond();
-        // Signed over "SUCCESS", sent with "FAILURE" — the classic tamper.
+        // Signed over "SUCCESS", sent with "FAILURE": the classic tamper.
         String signature = signatureHeader(now, signedBody(challengeId, "SUCCESS"));
 
         mockMvc.perform(post("/3ds/callback/" + challengeId)
@@ -245,7 +245,7 @@ public class ThreedsFlowTest {
                         .content(body))
                 .andExpect(status().isOk());
 
-        // Same assertion, freshly re-signed — a genuinely valid signature, replayed too late.
+        // Same assertion, freshly re-signed: a genuinely valid signature, replayed too late.
         mockMvc.perform(post("/3ds/callback/" + challengeId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Switch-Signature", signatureHeader(Instant.now().getEpochSecond(), body))

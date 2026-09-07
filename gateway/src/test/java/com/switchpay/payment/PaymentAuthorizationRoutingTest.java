@@ -33,9 +33,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * §3 steps 6–7: proves the payment flow actually goes through the Router rather than around it.
+ * §3 steps 6-7: proves the payment flow actually goes through the Router rather than around it.
  *
- * The HTTP boundary ({@link AcquirerClient}) is the only thing mocked — candidate selection,
+ * The HTTP boundary ({@link AcquirerClient}) is the only thing mocked; candidate selection,
  * priority ordering, retry-safety classification and failover all run for real. The wire-level
  * behaviour of the client itself is covered by AcquirerFailureMatrixTest.
  *
@@ -78,7 +78,7 @@ public class PaymentAuthorizationRoutingTest {
                 merchantId);
         cardToken = "tok_" + UUID.randomUUID().toString().replace("-", "");
         // A fingerprint unique per test method, not a literal shared by every card_token row in
-        // this class — VELOCITY_CARD_1H is real (NR-10), so a shared fingerprint would accumulate
+        // this class: VELOCITY_CARD_1H is real (NR-10), so a shared fingerprint would accumulate
         // score across this class's six test methods (NR-10's own landmine note).
         byte[] panFingerprint = UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
         jdbcTemplate.update("""
@@ -123,7 +123,7 @@ public class PaymentAuthorizationRoutingTest {
 
         PaymentEntity entity = authorizeOnePayment();
 
-        // This is the key StatusProbeJob will later ask about — if it were anything else,
+        // This is the key StatusProbeJob will later ask about: if it were anything else,
         // an AUTH_UNKNOWN could never be resolved.
         var sent = org.mockito.ArgumentCaptor.forClass(AuthorizationRequest.class);
         verify(acquirerClient).authorize(anyString(), sent.capture(), eq("VISA-NET-EU"));

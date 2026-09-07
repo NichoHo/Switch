@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * Pure diff of the gateway's internal captures against the acquirer's settlement file.
- * No Spring, no JPA — proven by feeding it hand-built lists, one discrepancy type per test.
+ * No Spring, no JPA: proven by feeding it hand-built lists, one discrepancy type per test.
  */
 public final class ReconDiffer {
     private ReconDiffer() {}

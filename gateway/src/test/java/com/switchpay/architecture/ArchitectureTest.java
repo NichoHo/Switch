@@ -29,7 +29,7 @@ class ArchitectureTest {
      * NR-14: a controller assembling its own response by reaching into a repository is a
      * decision about how two tables join, made in the layer that's supposed to only know about
      * HTTP shape. Written after the fact, once {@code PaymentController}, {@code SettlementController}
-     * and {@code ThreedsCallbackController} already had the offending dependencies removed —
+     * and {@code ThreedsCallbackController} already had the offending dependencies removed:
      * this is what stops a fourth controller from reintroducing the pattern during Phase 9.
      */
     @Test

@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/** §14 — chargeback ledger postings and the payment's denormalised dispute_state. */
+/** §14: chargeback ledger postings and the payment's denormalised dispute_state. */
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
@@ -73,7 +73,7 @@ public class DisputeIntegrationTest {
         jdbcTemplate.update(
             "INSERT INTO merchant (id, name, api_key_hash, webhook_secret) VALUES (?, 'Test', 'hash', 'secret')", merchantId);
         String token = "tok_" + UUID.randomUUID().toString().replace("-", "");
-        // Unique per call, not a literal shared across every payment this method creates —
+        // Unique per call, not a literal shared across every payment this method creates:
         // VELOCITY_CARD_1H is real (NR-10); see its landmine note.
         byte[] panFingerprint = UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
         jdbcTemplate.update("""

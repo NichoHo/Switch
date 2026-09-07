@@ -3,7 +3,7 @@ package com.switchpay.dispute;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Dispute aggregate — pure domain model, mirrors the Payment aggregate's style. */
+/** Dispute aggregate: pure domain model, mirrors the Payment aggregate's style. */
 public class Dispute {
     private final UUID id;
     private final UUID paymentId;

@@ -67,7 +67,7 @@ public class PaymentPropertyTest {
                     }
                 }
             } catch (Exception e) {
-                // Guard clauses (amount checks) may reject even if permits() passed — skip
+                // Guard clauses (amount checks) may reject even if permits() passed: skip
             }
         }
     }

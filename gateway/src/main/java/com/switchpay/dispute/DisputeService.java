@@ -88,7 +88,7 @@ public class DisputeService {
         return entity;
     }
 
-    /** Denormalised for display/filtering only (§14) — never read back to make a decision. */
+    /** Denormalised for display/filtering only (§14): never read back to make a decision. */
     private void updatePaymentDisputeState(UUID paymentId, DisputeState state) {
         PaymentEntity payment = paymentRepository.findById(paymentId)
             .orElseThrow(() -> new IllegalArgumentException("Payment not found"));

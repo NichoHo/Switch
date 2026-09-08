@@ -25,6 +25,10 @@ services:
       # routing/AcquirerDirectory and payment/api/PaymentController read (NR-11). Without it,
       # the container fell back to localhost:8081 (itself, not the acquirer-sim container).
       ACQUIRER_SIM_URL: http://acquirer-sim:8081
+      # Set to enable tracing (see gateway/Dockerfile): agora's Jaeger,
+      # reached over the host since this stack has its own compose network.
+      #   OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -41,3 +45,4 @@ services:
       # Maps to gateway.url (NR-11): what AcsController posts its signed 3DS assertion to.
       # localhost inside this container is acquirer-sim itself, not the gateway.
       GATEWAY_URL: http://gateway:8080
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}

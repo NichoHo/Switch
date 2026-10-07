@@ -213,6 +213,7 @@ public class AcquirerFailureMatrixTest {
 
         // Reset WireMock to count subsequent requests
         removeAllMappings();
+        resetAllRequests();
         stubFor(post(urlEqualTo("/a1/authorizations"))
                 .willReturn(okJson("{\"status\":\"APPROVED\",\"acquirerReference\":\"ref1\",\"authCode\":\"123456\",\"declineReason\":null}")));
         stubFor(post(urlEqualTo("/a2/authorizations"))

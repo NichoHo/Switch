@@ -3,7 +3,7 @@ package com.switchpay.admin;
 import com.switchpay.common.Currency;
 import com.switchpay.dispute.DisputeService;
 import com.switchpay.merchant.MerchantEntity;
-import com.switchpay.merchant.MerchantRepository;
+import com.switchpay.merchant.MerchantService;
 import com.switchpay.payment.PaymentContext;
 import com.switchpay.payment.PaymentService;
 import com.switchpay.payment.domain.Payment;
@@ -101,7 +101,7 @@ public class SeedController {
             sale("ORD-20458", "GB-A", Currency.EUR, 3_900, 0, "FR", Outcome.CAPTURE)
     );
 
-    private final MerchantRepository merchantRepository;
+    private final MerchantService merchantService;
     private final PaymentService paymentService;
     private final RulesetService rulesetService;
     private final CardVaultService cardVaultService;
@@ -109,11 +109,11 @@ public class SeedController {
     private final SettlementBatchJob settlementBatchJob;
     private final JdbcTemplate jdbc;
 
-    public SeedController(MerchantRepository merchantRepository, PaymentService paymentService,
+    public SeedController(MerchantService merchantService, PaymentService paymentService,
                           RulesetService rulesetService, CardVaultService cardVaultService,
                           DisputeService disputeService, SettlementBatchJob settlementBatchJob,
                           JdbcTemplate jdbc) {
-        this.merchantRepository = merchantRepository;
+        this.merchantService = merchantService;
         this.paymentService = paymentService;
         this.rulesetService = rulesetService;
         this.cardVaultService = cardVaultService;
@@ -125,7 +125,7 @@ public class SeedController {
     @PostMapping("/seed")
     @ResponseStatus(HttpStatus.CREATED)
     public void seed() {
-        if (merchantRepository.existsById(MERCHANT_ID)) {
+        if (merchantService.exists(MERCHANT_ID)) {
             return;
         }
 
@@ -153,7 +153,7 @@ public class SeedController {
         merchant.setRateBps(250);
         merchant.setFixedFeeMinor(30);
         merchant.setCreatedAt(Instant.now());
-        merchantRepository.save(merchant);
+        merchantService.save(merchant);
 
         // Risk velocity counts assessments by their real timestamp, so play the whole script
         // first and move the timestamps afterwards.

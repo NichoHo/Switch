@@ -24,4 +24,4 @@ jobs:
       run: mvn -B clean test
       
     - name: Run PIT Mutation Tests
-      run: mvn -B -pl gateway -am test-compile pitest:mutationCoverage
+      run: mvn -B -pl gateway -am test-compile org.pitest:pitest-maven:1.15.0:mutationCoverage

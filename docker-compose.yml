@@ -5,8 +5,10 @@ services:
       POSTGRES_DB: switch
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    # Loopback only: agora's Oracle deploy runs this file on a public host,
+    # and these are default credentials.
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -19,7 +21,10 @@ services:
       dockerfile: gateway/Dockerfile
     ports:
       - "8080:8080"
+    # Without a cap the JVM sizes its heap from the whole host's RAM.
+    mem_limit: 768m
     environment:
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=70
       DB_HOST: postgres
       # Spring's relaxed env-var binding maps this to the acquirer.sim.url property that
       # routing/AcquirerDirectory and payment/api/PaymentController read (NR-11). Without it,
@@ -41,7 +46,9 @@ services:
       dockerfile: acquirer-sim/Dockerfile
     ports:
       - "3002:8081"
+    mem_limit: 768m
     environment:
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=70
       # Maps to gateway.url (NR-11): what AcsController posts its signed 3DS assertion to.
       # localhost inside this container is acquirer-sim itself, not the gateway.
       GATEWAY_URL: http://gateway:8080

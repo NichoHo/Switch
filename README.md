@@ -21,6 +21,8 @@ When the services are up, seed the demo data:
 ./seed.sh
 ```
 
+The seed plays a fixed script of 23 payments over three days. It covers every payment state, all four acquirers, risk allow, challenge and deny decisions, 3DS results, refunds, a dispute, and settled batches. A second run does nothing. To start over, run `docker compose down -v`, then `docker compose up -d` and `./seed.sh`.
+
 Then open the operator console: [http://localhost:8080/dashboard](http://localhost:8080/dashboard)
 
 ## Features
@@ -79,9 +81,27 @@ The repository root holds a `render.yaml` blueprint. Connect your repository to 
 The blueprint configures two services, `gateway` and `acquirer-sim`. It sets JVM flags for low memory
 (`-XX:MaxRAMPercentage=70 -XX:+UseSerialGC -Xss512k -XX:TieredStopAtLevel=1`).
 
-**Cold starts:** Free Render services stop after a period of inactivity. After a long idle period, the
-first request can take up to a minute while the service starts. The `/actuator/health` endpoints are
-public. Use a ping service such as `cron-job.org` to keep the instances awake.
+**Cold starts:** Free Render services stop after 15 minutes without traffic. The first request after
+that can take up to a minute while the service starts. The `/actuator/health` endpoints are public, so
+a ping service such as `cron-job.org` can keep a service awake.
+
+**Ping schedule:** Render gives 750 free instance-hours each month, shared by all services in the
+account. Two services that are always awake use approximately 1,460 hours. Do not keep the services
+awake all day. Ping them only for the nightly jobs. The times are UTC. If your ping service uses a
+different time zone, convert them.
+
+| Service | Crontab (UTC) | Reason |
+|---------|---------------|--------|
+| `gateway` | `*/5 1-2 * * *` | The settlement job runs at 02:00 and the recon job runs at 02:30. These jobs run only when the gateway is awake. |
+| `acquirer-sim` | `20,25 2 * * *` | The recon job gets the settlement file from `acquirer-sim` at 02:30. |
+
+These schedules use approximately 80 hours each month. At other times, each service starts on the
+first request, so the first page load can take up to a minute. The first payment after `acquirer-sim`
+starts can time out after 5 seconds and go to `AUTH_UNKNOWN`. The status probe job resolves the
+payment when `acquirer-sim` is available.
+
+Agora does not use this Render copy. Agora runs its own copy of Switch on its Oracle server. Refer to
+`deploy/oracle/README.md` step 6 in the Agora repository.
 
 ### Neon (Database)
 

@@ -1509,7 +1509,7 @@ and filters, `prefers-reduced-motion` respected for the htmx swap transitions.
 | `gateway` | Render free web service, Docker | Public URL, dashboard + API |
 | `acquirer-sim` | Render free web service, Docker | Reachable by gateway; ACS page must be publicly reachable for the 3DS redirect |
 | PostgreSQL | Neon free tier | Pooled connection string |
-| Keep-alive | cron-job.org | Pings `/actuator/health` on both services |
+| Keep-alive | cron-job.org | Nightly jobs only: pings `gateway` `/actuator/health` every 5 min from 01:00 to 03:00 UTC, and `acquirer-sim` at 02:20 and 02:25 UTC for recon (~80h/month). Not 24/7: two always-awake services need ~1,460h of the 750h free pool. Agora runs its own always-on copy on its Oracle host |
 | Scheduled jobs | In-process `@Scheduled` | Plus secured admin endpoints so an external cron can trigger settlement/recon on demand |
 
 > Free-tier limits change. Verify current Render and Neon terms before relying on the specifics
@@ -1529,8 +1529,9 @@ the app is broken. The dashboard shows a "waking up" state instead of a spinner 
 timeout, `connectionTimeout` 10s to survive a cold database, and retry-on-startup so a suspended
 database does not crash-loop the app.
 
-**No managed cron on free tier.** `@Scheduled` runs in the web service. Single instance, so
-distributed locking is unnecessary:
+**No managed cron on free tier.** `@Scheduled` runs in the web service, so it only fires while the
+service is awake; the keep-alive window must cover the 02:00 settlement and 02:30 UTC recon runs.
+Single instance, so distributed locking is unnecessary:
 
 ```
 // @Scheduled in-process, single instance. Add ShedLock (one annotation, one table)

@@ -21,6 +21,9 @@ public final class BinDirectory {
         if (panStr.startsWith("400000")) {
             return Optional.of(new BinMetadata(panStr.substring(0, 8), "VISA", "CREDIT", "US"));
         }
+        if (panStr.startsWith("52008282")) {
+            return Optional.of(new BinMetadata(panStr.substring(0, 8), "MASTERCARD", "DEBIT", "DE"));
+        }
         if (panStr.startsWith("55555555")) {
             return Optional.of(new BinMetadata(panStr.substring(0, 8), "MASTERCARD", "CREDIT", "US"));
         }

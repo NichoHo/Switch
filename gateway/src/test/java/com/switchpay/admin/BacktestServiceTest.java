@@ -61,6 +61,7 @@ public class BacktestServiceTest {
         merchant.setId(UUID.randomUUID());
         merchant.setName("Test Merchant");
         merchant.setApiKeyHash("hash");
+        merchant.setWebhookSecret("secret");
         merchant.setDenyThreshold(70);
         merchant.setChallengeThreshold(40);
         merchantRepository.save(merchant);

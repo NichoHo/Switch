@@ -327,7 +327,7 @@ td.num .cur { color: var(--text-3); font-size: 11px; }
    RESPONSIVE / MOTION
    ========================================================================== */
 @media (max-width: 900px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
   .sidebar {
     border-right: 0; border-bottom: 1px solid var(--border);
     flex-direction: row; align-items: center; gap: var(--sp-4);
